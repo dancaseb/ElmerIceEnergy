@@ -1,0 +1,11 @@
+# Excluded directories
+.venv/
+
+# Exclude Dockerfiles
+Dockerfile
+
+# Exclude .sif images
+*.sif
+
+# Exclude runs directory 
+runs/

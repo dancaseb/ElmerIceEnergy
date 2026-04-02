@@ -1,0 +1,21 @@
+{
+    "arch": "aarch64",
+    "march": "neoverse_v2",
+    "cuda_arch": "90",
+    "base_image": "nvidia/cuda",
+    "base_os": "ubuntu24",
+    "cuda_version": "12.5",
+    "tag_devel": "12.5.1-devel-ubuntu24.04",
+    "digest_devel": "sha256:a866081722c6883a9b51a83acb673f784506454852ef5e7bdaa6b99dc958b218",
+    "tag_runtime": "12.5.1-runtime-ubuntu24.04",
+    "digest_runtime": "sha256:37a25acfc46f9ec05b7131639ed9467810b45522a3dfa99038635ed73c3f1e3c",
+    "network_stack": {
+        "mlnx_ofed": "24.04-0.7.0.0",
+        "knem": false,
+        "xpmem": true,
+        "gdrcopy": true,
+        "ucx": "1.18.0",
+        "pmix": "internal",
+        "ompi": "5.0.3"
+    }
+}

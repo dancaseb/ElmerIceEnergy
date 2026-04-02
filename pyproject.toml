@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: (C) 2026 Marco Celoria <celoria.marco@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[project]
+name = "elmericeenergy"
+version = "0.1.0"
+description = "ElmerIce Energy monitoring and optimization"
+readme = "README.md"
+authors = [
+    { name = "Marco Celoria", email = "celoria.marco@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "black>=25.12.0",
+    "archspec==0.2.5",
+    "hpccm==26.01.0",
+    "six==1.17.0",
+    "fastrlock==0.8.3",
+    "flake8>=7.3.0",
+    "iniconfig==2.3.0",
+    "isort>=7.0.0",
+    "packaging==25.0",
+    "pygments==2.19.2",
+    "mypy>=1.19.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+#[build-system]
+#requires = ["uv_build>=0.9.22,<0.10.0"]
+#build-backend = "uv_build"
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3 
+
+[tool.mypy]
+disable_error_code = ["import-untyped"]
+

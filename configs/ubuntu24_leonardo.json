@@ -1,0 +1,21 @@
+{
+    "arch": "x86_64",
+    "march": "skylake",
+    "cuda_arch": "80",
+    "base_image": "nvidia/cuda",
+    "base_os": "ubuntu24",
+    "cuda_version": "12.5",
+    "tag_devel": "12.5.1-devel-ubuntu24.04",
+    "digest_devel": "sha256:22b2c8ece8c90186d4fa21efaa7af70644670196765cd03e4c1c5be115fa0139",
+    "tag_runtime": "12.5.1-runtime-ubuntu24.04",
+    "digest_runtime": "sha256:0e5a4647ccb8589bb364605cca6c2e17b35b226d4b917faccbffba798c434639",
+    "network_stack": {
+        "mlnx_ofed": "24.04-0.7.0.0",
+        "knem": true,
+        "xpmem": true,
+        "gdrcopy": true,
+        "ucx": "1.17.0",
+        "pmix": "3.1.5",
+        "ompi": "4.1.6"
+    }
+}
