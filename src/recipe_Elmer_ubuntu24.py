@@ -8,8 +8,8 @@ import hpccm.building_blocks as bb
 from hpccm.primitives import baseimage, comment
 
 # Get correct config
-# config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_thea.json"))
-config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_leonardo.json"))
+config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_thea.json"))
+# config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_leonardo.json"))
 # config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_jedi.json"))
 if not config_file.exists():
     raise RuntimeError(
@@ -414,7 +414,7 @@ elmer_toolchain = hpccm.toolchain(LDFLAGS="-lcurl")
 elmer = hpccm.building_blocks.generic_cmake(
     repository="https://github.com/ElmerCSC/elmerfem.git",
     branch="devel",
-    commit="b044ad3281a9c53656dd4f5f2842428bea1a5a5c",
+    commit="9dce9c2ac192b50fd29f00bef746debac1a8018e",
     recursive=True,
     toolchain=elmer_toolchain,
     prefix=elmer_prefix,
