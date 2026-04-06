@@ -40,7 +40,8 @@ Specifically, for each resource allocation, we vary the number of MPI ranks per 
 
 For each configuration, we measure the Time To Solution, Energy To Solution and Energy Delay Product (EDP) with NVIDIA MPS enabled.
 As baseline, we consider the case without NVIDIA MPS.
-The results are summarized in the plots below:
+
+The results are based on single runs, without statistical analysis, and are summarized in the plots below.
 
 ![Strong scaling TTS](results/Leonardo/strong_time_breakdown.png)
 ![Strong scaling ETS](results/Leonardo/strong_energy_breakdown.png)
