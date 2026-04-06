@@ -8,10 +8,10 @@ sync:
 	uv sync
 
 lint:
-	flake8 src
-	mypy src
-	isort --check-only src
+	flake8 recipes
+	mypy recipes
+	isort --check-only recipes
 
 format:
-	black src
-	isort src
+	black recipes
+	isort recipes
