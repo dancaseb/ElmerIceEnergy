@@ -14,6 +14,8 @@ Energy measurements are performed using Cinemon.
 Cinemon [cinemon](https://gitlab.hpc.cineca.it/waldo/cinemon-public) is a tool designed to monitor and measure energy consumption on CINECA systems. 
 It provides fine-grained power sampling by leveraging hardware interfaces such as RAPL (for CPUs) and NVML (for NVIDIA GPUs).
 
+The container definitions have been produced by means of HPC Container Maker [HPCCM](https://github.com/NVIDIA/hpc-container-maker)
+
 # Results on Leonardo Booster
 
 The results below refer to `ElmerCSC/elmerfem@9dce9c2ac192b50fd29f00bef746debac1a8018e` obtained on Leonardo Booster partition.
