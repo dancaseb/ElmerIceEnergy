@@ -23,7 +23,7 @@ export MESHLEVEL="ML3"
 
 # DIR PATHS
 export BASEDIR="/leonardo_work/cin_emon/uc/Marco/ElmerIceEnergy"
-export RUNDIR="${BASEDIR}/runs/Leonardo/run_Elmer_leonardo_N${SLURM_NNODES}_n${SLURM_NTASKS_PER_NODE}_c${SLURM_CPUS_PER_TASK}_${MESHLEVEL}_most_recent_${SLURM_JOB_ID}"
+export RUNDIR="${BASEDIR}/runs/Leonardo_most_recent/run_Elmer_leonardo_N${SLURM_NNODES}_n${SLURM_NTASKS_PER_NODE}_c${SLURM_CPUS_PER_TASK}_${MESHLEVEL}_most_recent_${SLURM_JOB_ID}"
 export SCRIPTSDIR="${BASEDIR}/scripts"
 export CONTAINERSDIR="${BASEDIR}/containers"
 export INPUTSDIR="${BASEDIR}/inputs"
