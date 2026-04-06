@@ -1,0 +1,782 @@
+# NOTE: this definition file depends on features only available in
+# Singularity 3.2 and later.
+BootStrap: docker
+From: docker.io/nvidia/cuda@sha256:22b2c8ece8c90186d4fa21efaa7af70644670196765cd03e4c1c5be115fa0139
+Stage: devel
+%post
+    . /.singularity.d/env/10-docker*.sh
+
+# step1: start
+
+# Install build tools over base image
+
+# Python
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3
+    rm -rf /var/lib/apt/lists/*
+
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        gcc-13-offload-nvptx \
+        gfortran \
+        zlib1g \
+        zlib1g-dev
+    rm -rf /var/lib/apt/lists/*
+
+# CMake version 3.31.4
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        make \
+        wget
+    rm -rf /var/lib/apt/lists/*
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/Kitware/CMake/releases/download/v3.31.4/cmake-3.31.4-linux-x86_64.sh
+    mkdir -p /usr/local
+    /bin/sh /var/tmp/cmake-3.31.4-linux-x86_64.sh --prefix=/usr/local --skip-license
+    rm -rf /var/tmp/cmake-3.31.4-linux-x86_64.sh
+%environment
+    export PATH=/usr/local/bin:$PATH
+%post
+    export PATH=/usr/local/bin:$PATH
+
+# Git, Pkgconf
+
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        git \
+        pkgconf
+    rm -rf /var/lib/apt/lists/*
+
+# step2: start
+
+# Install network stack packages and OpenMPI
+
+# Mellanox OFED version 24.04-0.7.0.0
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
+        gnupg \
+        wget
+    rm -rf /var/lib/apt/lists/*
+%post
+    wget -qO - https://www.mellanox.com/downloads/ofed/RPM-GPG-KEY-Mellanox | apt-key add -
+    mkdir -p /etc/apt/sources.list.d && wget -q -nc --no-check-certificate -P /etc/apt/sources.list.d https://linux.mellanox.com/public/repo/mlnx_ofed/24.04-0.7.0.0/ubuntu24.04/mellanox_mlnx_ofed.list
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ibverbs-providers \
+        ibverbs-utils \
+        libibmad-dev \
+        libibmad5 \
+        libibumad-dev \
+        libibumad3 \
+        libibverbs-dev \
+        libibverbs1 \
+        librdmacm-dev \
+        librdmacm1
+    rm -rf /var/lib/apt/lists/*
+
+# KNEM version 1.1.4
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
+        git
+    rm -rf /var/lib/apt/lists/*
+%post
+    cd /
+    mkdir -p /var/tmp && cd /var/tmp && git clone --depth=1 --branch knem-1.1.4 https://gitlab.inria.fr/knem/knem.git knem && cd -
+    mkdir -p /opt/knem
+    cd /var/tmp/knem
+    mkdir -p /opt/knem/include
+    cp common/*.h /opt/knem/include
+    rm -rf /var/tmp/knem
+%environment
+    export CPATH=/opt/knem/include:$CPATH
+%post
+    export CPATH=/opt/knem/include:$CPATH
+
+# XPMEM branch master
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        autoconf \
+        automake \
+        ca-certificates \
+        file \
+        git \
+        libtool \
+        make
+    rm -rf /var/lib/apt/lists/*
+%post
+    cd /
+    mkdir -p /var/tmp && cd /var/tmp && git clone --depth=1 --branch master https://github.com/hjelmn/xpmem.git xpmem && cd -
+    cd /var/tmp/xpmem
+    autoreconf --install
+    cd /var/tmp/xpmem &&   ./configure --prefix=/opt/xpmem --disable-kernel-module
+    make -j$(nproc)
+    make -j$(nproc) install
+    rm -rf /var/tmp/xpmem
+%environment
+    export CPATH=/opt/xpmem/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/xpmem/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/xpmem/lib:$LIBRARY_PATH
+%post
+    export CPATH=/opt/xpmem/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/xpmem/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/xpmem/lib:$LIBRARY_PATH
+
+# GDRCOPY version 2.4.4
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        make \
+        wget
+    rm -rf /var/lib/apt/lists/*
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/NVIDIA/gdrcopy/archive/v2.4.4.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/v2.4.4.tar.gz -C /var/tmp -z
+    cd /var/tmp/gdrcopy-2.4.4
+    mkdir -p /opt/gdrcopy/include /opt/gdrcopy/lib
+    make prefix=/opt/gdrcopy lib lib_install
+    rm -rf /var/tmp/gdrcopy-2.4.4 /var/tmp/v2.4.4.tar.gz
+%environment
+    export CPATH=/opt/gdrcopy/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/gdrcopy/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/gdrcopy/lib:$LIBRARY_PATH
+%post
+    export CPATH=/opt/gdrcopy/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/gdrcopy/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/gdrcopy/lib:$LIBRARY_PATH
+
+# UCX https://github.com/openucx/ucx.git v1.17.0
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        autoconf \
+        automake \
+        binutils-dev \
+        ca-certificates \
+        file \
+        git \
+        libnuma-dev \
+        libtool \
+        make \
+        wget
+    rm -rf /var/lib/apt/lists/*
+%post
+    cd /
+    mkdir -p /var/tmp && cd /var/tmp && git clone --depth=1 --branch v1.17.0 https://github.com/openucx/ucx.git ucx && cd -
+    cd /var/tmp/ucx
+    ./autogen.sh
+    cd /var/tmp/ucx &&   ./configure --prefix=/opt/ucx --disable-assertions --disable-debug --disable-doxygen-doc --disable-logging --disable-params-check --enable-mt --enable-optimizations --with-cuda=/usr/local/cuda --with-gdrcopy=/opt/gdrcopy --with-knem=/opt/knem --with-rdmacm --with-verbs --with-xpmem=/opt/xpmem
+    make -j$(nproc)
+    make -j$(nproc) install
+    rm -rf /var/tmp/ucx
+%environment
+    export CPATH=/opt/ucx/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/ucx/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/ucx/lib:$LIBRARY_PATH
+    export PATH=/opt/ucx/bin:$PATH
+%post
+    export CPATH=/opt/ucx/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/ucx/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/ucx/lib:$LIBRARY_PATH
+    export PATH=/opt/ucx/bin:$PATH
+
+# PMIX version 3.1.5
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        file \
+        hwloc \
+        libevent-dev \
+        make \
+        tar \
+        wget
+    rm -rf /var/lib/apt/lists/*
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/openpmix/openpmix/releases/download/v3.1.5/pmix-3.1.5.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/pmix-3.1.5.tar.gz -C /var/tmp -z
+    cd /var/tmp/pmix-3.1.5 &&   ./configure --prefix=/opt/pmix
+    make -j$(nproc)
+    make -j$(nproc) install
+    rm -rf /var/tmp/pmix-3.1.5 /var/tmp/pmix-3.1.5.tar.gz
+%environment
+    export CPATH=/opt/pmix/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/pmix/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/pmix/bin:$PATH
+%post
+    export CPATH=/opt/pmix/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/pmix/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/pmix/bin:$PATH
+
+# OpenMPI version 4.1.6
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        bzip2 \
+        file \
+        hwloc \
+        libnuma-dev \
+        make \
+        openssh-client \
+        perl \
+        tar \
+        wget
+    rm -rf /var/lib/apt/lists/*
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.6.tar.bz2
+    mkdir -p /var/tmp && tar -x -f /var/tmp/openmpi-4.1.6.tar.bz2 -C /var/tmp -j
+    cd /var/tmp/openmpi-4.1.6 &&   ./configure --prefix=/opt/openmpi --disable-getpwuid --enable-orterun-prefix-by-default --with-cuda --with-pmix=/opt/pmix --with-ucx=/opt/ucx --with-verbs
+    make -j$(nproc)
+    make -j$(nproc) install
+    rm -rf /var/tmp/openmpi-4.1.6 /var/tmp/openmpi-4.1.6.tar.bz2
+%environment
+    export LD_LIBRARY_PATH=/opt/openmpi/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/openmpi/bin:$PATH
+%post
+    export LD_LIBRARY_PATH=/opt/openmpi/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/openmpi/bin:$PATH
+
+# step3: start
+
+# Install I/O, meshing and math libraries
+
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libmetis-dev
+    rm -rf /var/lib/apt/lists/*
+
+# https://ftp.mcs.anl.gov/pub/pdetools/spack-pkgs/parmetis-4.0.3.tar.gz
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://ftp.mcs.anl.gov/pub/pdetools/spack-pkgs/parmetis-4.0.3.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/parmetis-4.0.3.tar.gz -C /var/tmp -z
+    cd /var/tmp/parmetis-4.0.3
+    CC=mpicc CXX=mpic++ make config shared=1 prefix=/opt/parmetis
+    make -j$(nproc)
+    make -j$(nproc) install
+    cp /usr/lib/x86_64-linux-gnu/libmetis.so.5.1.0 /opt/parmetis/lib/libmetis.so
+    cp /usr/include/metis.h /opt/parmetis/include/metis.h
+    rm -rf /var/tmp/parmetis-4.0.3 /var/tmp/parmetis-4.0.3.tar.gz
+%environment
+    export CPATH=/opt/parmetis/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/parmetis/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/parmetis/lib:$LIBRARY_PATH
+    export PATH=/opt/parmetis/bin:$PATH
+%post
+    export CPATH=/opt/parmetis/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/parmetis/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/parmetis/lib:$LIBRARY_PATH
+    export PATH=/opt/parmetis/bin:$PATH
+
+# https://gmsh.info/src/gmsh-4.13.1-source.tgz
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://gmsh.info/src/gmsh-4.13.1-source.tgz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/gmsh-4.13.1-source.tgz -C /var/tmp -z
+    cd /var/tmp/gmsh-4.13.1-source
+    mkdir -p build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX="/opt/gmsh" -DCMAKE_C_COMPILER=gcc -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_CXX_COMPILER=g++ ..
+    make -j$(nproc)
+    make -j$(nproc) install
+    rm -rf /var/tmp/gmsh-4.13.1-source /var/tmp/gmsh-4.13.1-source.tgz
+%environment
+    export PATH=/opt/gmsh/bin:$PATH
+%post
+    export PATH=/opt/gmsh/bin:$PATH
+
+# https://github.com/hypre-space/hypre/archive/refs/tags/v2.32.0.tar.gz
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/hypre-space/hypre/archive/refs/tags/v2.32.0.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/v2.32.0.tar.gz -C /var/tmp -z
+    cd /var/tmp/hypre-2.32.0
+    cd src
+    ./configure --with-openmp --with-blas --with-lapack --prefix="/opt/hypre" CC="mpicc -fPIC -O3 -march=native"
+    make -j$(nproc)
+    make install
+    rm -rf /var/tmp/hypre-2.32.0 /var/tmp/v2.32.0.tar.gz
+%environment
+    export CMAKE_PREFIX_PATH=/opt/hypre:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/hypre/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/hypre/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/hypre/lib:$LIBRARY_PATH
+    export PATH=/opt/hypre/bin:$PATH
+%post
+    export CMAKE_PREFIX_PATH=/opt/hypre:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/hypre/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/hypre/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/hypre/lib:$LIBRARY_PATH
+    export PATH=/opt/hypre/bin:$PATH
+
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libblas-dev \
+        libcholmod5 \
+        libgomp1 \
+        liblapack-dev \
+        libnetcdf-dev \
+        libnetcdff-dev \
+        libsuitesparse-dev \
+        libumfpack6
+    rm -rf /var/lib/apt/lists/*
+
+# https://github.com/sakov/nn-c/archive/refs/tags/v1.85.0.tar.gz
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/sakov/nn-c/archive/refs/tags/v1.85.0.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/v1.85.0.tar.gz -C /var/tmp -z
+    cd /var/tmp/nn-c-1.85.0
+    cd nn
+    CFLAGS="-fPIC -O3 -march=native -ffast-math -funroll-loops"  ./configure --prefix="/opt/nn"
+    make clean
+    gcc -c -DTRILIBRARY -fPIC -O2 -w -ffloat-store -I. triangle.c
+    make install
+    rm -rf /var/tmp/nn-c-1.85.0 /var/tmp/v1.85.0.tar.gz
+%environment
+    export CPATH=/opt/nn/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/nn/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/nn/lib:$LIBRARY_PATH
+    export PATH=/opt/nn/bin:$PATH
+%post
+    export CPATH=/opt/nn/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/nn/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/nn/lib:$LIBRARY_PATH
+    export PATH=/opt/nn/bin:$PATH
+
+# https://github.com/sakov/csa-c/archive/refs/tags/v1.22.0.tar.gz
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/sakov/csa-c/archive/refs/tags/v1.22.0.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/v1.22.0.tar.gz -C /var/tmp -z
+    cd /var/tmp/csa-c-1.22.0
+    cd csa
+    ./configure --prefix="/opt/csa" CC="gcc -fPIC -O3 -march=native"
+    make -j$(nproc)
+    make install
+    rm -rf /var/tmp/csa-c-1.22.0 /var/tmp/v1.22.0.tar.gz
+%environment
+    export CMAKE_PREFIX_PATH=/opt/csa:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/csa/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/csa/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/csa/lib:$LIBRARY_PATH
+    export PATH=/opt/csa/bin:$PATH
+%post
+    export CMAKE_PREFIX_PATH=/opt/csa:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/csa/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/csa/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/csa/lib:$LIBRARY_PATH
+    export PATH=/opt/csa/bin:$PATH
+
+# https://github.com/MmgTools/mmg/archive/refs/tags/v5.8.0.tar.gz
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/MmgTools/mmg/archive/refs/tags/v5.8.0.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/v5.8.0.tar.gz -C /var/tmp -z
+    mkdir -p /var/tmp/mmg-5.8.0/build && cd /var/tmp/mmg-5.8.0/build && cmake -DCMAKE_INSTALL_PREFIX=/opt/mmg -DCMAKE_INSTALL_PREFIX="/opt/mmg" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS:BOOL=TRUE -DMMG_INSTALL_PRIVATE_HEADERS=ON -DCMAKE_C_FLAGS="-fPIC  -g" -DCMAKE_CXX_FLAGS="-fPIC -std=c++11 -g" -DCMAKE_C_COMPILER=gcc -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_CXX_COMPILER=g++ /var/tmp/mmg-5.8.0
+    cmake --build /var/tmp/mmg-5.8.0/build --target all -- -j$(nproc)
+    cmake --build /var/tmp/mmg-5.8.0/build --target install -- -j$(nproc)
+    rm -rf /var/tmp/mmg-5.8.0 /var/tmp/v5.8.0.tar.gz
+%environment
+    export CPATH=/opt/mmg/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/mmg/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/mmg/lib:$LIBRARY_PATH
+    export MMG_DIR=/opt/mmg
+    export PATH=/opt/mmg/bin:$PATH
+%post
+    export CPATH=/opt/mmg/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/mmg/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/mmg/lib:$LIBRARY_PATH
+    export MMG_DIR=/opt/mmg
+    export PATH=/opt/mmg/bin:$PATH
+
+# https://github.com/MmgTools/ParMmg/archive/refs/tags/v1.5.0.tar.gz
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/MmgTools/ParMmg/archive/refs/tags/v1.5.0.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/v1.5.0.tar.gz -C /var/tmp -z
+    mkdir -p /var/tmp/ParMmg-1.5.0/build && cd /var/tmp/ParMmg-1.5.0/build && cmake -DCMAKE_INSTALL_PREFIX=/opt/parmmg -DCMAKE_INSTALL_PREFIX="/opt/parmmg" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS:BOOL=TRUE -DDOWNLOAD_MMG=OFF -DMMG_DIR="/opt/mmg" -DCMAKE_C_FLAGS="-fPIC  -g" -DCMAKE_CXX_FLAGS="-fPIC -std=c++11 -g" -DCMAKE_C_COMPILER=gcc -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_CXX_COMPILER=g++ /var/tmp/ParMmg-1.5.0
+    cmake --build /var/tmp/ParMmg-1.5.0/build --target all -- -j$(nproc)
+    cmake --build /var/tmp/ParMmg-1.5.0/build --target install -- -j$(nproc)
+    rm -rf /var/tmp/ParMmg-1.5.0 /var/tmp/v1.5.0.tar.gz
+%environment
+    export CPATH=/opt/parmmg/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/parmmg/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/parmmg/lib:$LIBRARY_PATH
+    export PARMMG_DIR=/opt/parmmg
+    export PATH=/opt/parmmg/bin:$PATH
+%post
+    export CPATH=/opt/parmmg/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/parmmg/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/parmmg/lib:$LIBRARY_PATH
+    export PARMMG_DIR=/opt/parmmg
+    export PATH=/opt/parmmg/bin:$PATH
+
+# AMGX branch master
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        git \
+        make
+    rm -rf /var/lib/apt/lists/*
+%post
+    cd /
+    mkdir -p /var/tmp && cd /var/tmp && git clone --recursive https://github.com/NVIDIA/amgx amgx && cd - && cd /var/tmp/amgx && git checkout 3188dce5bdc22e96407d609e398925bed6aa010d && cd -
+    mkdir -p /var/tmp/amgx/build && cd /var/tmp/amgx/build && cmake -DCMAKE_INSTALL_PREFIX=/opt/amgx -DCUDA_ARCH=80 -DCMAKE_C_COMPILER=gcc -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_CXX_COMPILER=g++ -DMPI_C_COMPILER=mpicc -DMPI_CXX_COMPILER=mpicxx -DMPI_Fortran_COMPILER=mpif90 -DCMAKE_C_FLAGS="-O3 -march=native -ffast-math -funroll-loops" -DCMAKE_CXX_FLAGS="-O3 -march=native -ffast-math -funroll-loops" -DCMAKE_Fortran_FLAGS="-O3 -march=native -ffast-math -funroll-loops" /var/tmp/amgx
+    cmake --build /var/tmp/amgx/build --target all -- -j$(nproc)
+    cmake --build /var/tmp/amgx/build --target install -- -j$(nproc)
+    rm -rf /var/tmp/amgx
+%environment
+    export CPATH=/opt/amgx/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/amgx/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/amgx/lib:$LIBRARY_PATH
+%post
+    export CPATH=/opt/amgx/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/amgx/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/amgx/lib:$LIBRARY_PATH
+
+# step4: start
+
+# Install geospatial data acquisition tools
+
+# https://www.lua.org/ftp/lua-5.4.7.tar.gz
+%post
+    cd /
+    mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.lua.org/ftp/lua-5.4.7.tar.gz
+    mkdir -p /var/tmp && tar -x -f /var/tmp/lua-5.4.7.tar.gz -C /var/tmp -z
+    cd /var/tmp/lua-5.4.7
+    make all install INSTALL_TOP=/opt/lua
+    rm -rf /var/tmp/lua-5.4.7 /var/tmp/lua-5.4.7.tar.gz
+%environment
+    export CMAKE_PREFIX_PATH=/opt/lua:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/lua/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/lua/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/lua/lib:$LIBRARY_PATH
+    export PATH=/opt/lua/bin:$PATH
+%post
+    export CMAKE_PREFIX_PATH=/opt/lua:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/lua/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/lua/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/lua/lib:$LIBRARY_PATH
+    export PATH=/opt/lua/bin:$PATH
+
+# step5: start
+
+# Install Elmer
+
+# https://github.com/ElmerCSC/elmerfem.git
+%post
+    cd /
+    mkdir -p /var/tmp && cd /var/tmp && git clone --recursive https://github.com/ElmerCSC/elmerfem.git elmerfem && cd - && cd /var/tmp/elmerfem && git checkout 7b073597d1c1df84367f1dfaa44972306643a311 && cd -
+    mkdir -p /var/tmp/elmerfem/build && cd /var/tmp/elmerfem/build && LDFLAGS=-lcurl cmake -DCMAKE_INSTALL_PREFIX=/opt/elmer -DParMetis_LIBRARIES="/opt/parmetis/lib/libmetis.so;/opt/parmetis/lib/libparmetis.so" -DParMetis_INCLUDE_DIR="/opt/parmetis/include" -DMetis_LIBRARIES="/usr/lib/x86_64-linux-gnu/libmetis.so.5.1.0" -DMetis_INCLUDE_DIR="/usr/include/metis.h" -DWITH_MPI:BOOL=TRUE -DWITH_LUA:BOOL=TRUE -DWITH_OpenMP:BOOL=TRUE -DWITH_Mumps:BOOL=FALSE -DWITH_Hypre:BOOL=TRUE -DWITH_NETCDF:BOOL=TRUE -DNETCDF_LIBRARY="/usr/lib/x86_64-linux-gnu/libnetcdf.so" -DNETCDFF_LIBRARY="/usr/lib/x86_64-linux-gnu/libnetcdff.so" -DNETCDF_INCLUDE_DIR="/usr/include" -DHYPRE_INCLUDE_DIR="/opt/include/hypre" -DWITH_Zoltan:BOOL=TRUE -DWITH_Trilinos:BOOL=FALSE -DWITH_ELMERGUI:BOOL=FALSE -DWITH_GridDataReader:BOOL=TRUE -DWITH_ScatteredDataInterpolator:BOOL=TRUE -DEXTERNAL_UMFPACK:BOOL=FALSE -DWITH_CHOLMOD:BOOL=TRUE -DWITH_AMGX:BOOL=TRUE -DAMGX_ROOT="/opt/amgx" -DAMGX_INCLUDE_DIR="/opt/amgx/include/;/usr/local/cuda-12.5/include" -DAMGX_LIBRARY="/opt/amgx/lib/libamgx.a" -DCUDA_LIBRARIES="-L/usr/local/cuda-12.5/lib64/libcudart.so.12 -L/usr/local/cuda-12.5/lib64/ -lcudadevrt -lrt -lpthread -lcudart_static -lnvToolsExt -ldl -lcusparse -lcublas -lcusolver" -DCUDA_LIBDIR="/usr/local/cuda-12.5/lib64" -DCUDA_INCLUDE_DIR="/usr/local/cuda-12.5/include" -DCUDA_ARCH=80 -DCSA_LIBRARY="/opt/csa/lib/libcsa.a" -DCSA_INCLUDE_DIR="/opt/csa/include" -DNN_INCLUDE_DIR="/opt/nn/include" -DNN_LIBRARY="/opt/nn/lib/libnn.a" -DWITH_MMG:BOOL=TRUE -DMMG_INCLUDE_DIR="/opt/mmg/include/" -DMMG_LIBRARY="/opt/mmg/lib/libmmg.so" -DMMG_LIBDIR="/opt/mmg/lib" -DWITH_PARMMG:BOOL=TRUE -DPARMMG_INCLUDE_DIR="/opt/parmmg/include" -DPARMMG_LIBRARY="/opt/parmmg/lib/libparmmg.so" -DWITH_ElmerIce:BOOL=TRUE -DCMAKE_C_COMPILER=gcc -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_CXX_COMPILER=g++ -DMPI_C_COMPILER=mpicc -DMPI_CXX_COMPILER=mpicxx -DMPI_Fortran_COMPILER=mpif90 -DCMAKE_C_FLAGS="-g -O3" -DCMAKE_CXX_FLAGS="-g -O3" -DCMAKE_Fortran_FLAGS="-g -O2 -fPIC -fopenmp -foffload=nvptx-none="-march=sm_80"" -DCMAKE_Fortran_FLAGS_RELWITHDEB="-g -O2 -fPIC -DNDEBUG -fopenmp -foffload=nvptx-none="-march=sm_80"" /var/tmp/elmerfem
+    cmake --build /var/tmp/elmerfem/build --target all -- -j$(nproc)
+    cmake --build /var/tmp/elmerfem/build --target install -- -j$(nproc)
+    rm -rf /var/tmp/elmerfem
+
+# step6: start
+
+# Generate runtime image
+
+BootStrap: docker
+From: docker.io/nvidia/cuda@sha256:0e5a4647ccb8589bb364605cca6c2e17b35b226d4b917faccbffba798c434639
+%post
+    . /.singularity.d/env/10-docker*.sh
+
+# Python
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3
+    rm -rf /var/lib/apt/lists/*
+
+# Mellanox OFED version 24.04-0.7.0.0
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
+        gnupg \
+        wget
+    rm -rf /var/lib/apt/lists/*
+%post
+    wget -qO - https://www.mellanox.com/downloads/ofed/RPM-GPG-KEY-Mellanox | apt-key add -
+    mkdir -p /etc/apt/sources.list.d && wget -q -nc --no-check-certificate -P /etc/apt/sources.list.d https://linux.mellanox.com/public/repo/mlnx_ofed/24.04-0.7.0.0/ubuntu24.04/mellanox_mlnx_ofed.list
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ibverbs-providers \
+        ibverbs-utils \
+        libibmad-dev \
+        libibmad5 \
+        libibumad-dev \
+        libibumad3 \
+        libibverbs-dev \
+        libibverbs1 \
+        librdmacm-dev \
+        librdmacm1
+    rm -rf /var/lib/apt/lists/*
+
+# KNEM
+%files from devel
+    /opt/knem /opt/knem
+%environment
+    export CPATH=/opt/knem/include:$CPATH
+%post
+    export CPATH=/opt/knem/include:$CPATH
+
+# XPMEM
+%files from devel
+    /opt/xpmem /opt/xpmem
+%environment
+    export CPATH=/opt/xpmem/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/xpmem/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/xpmem/lib:$LIBRARY_PATH
+%post
+    export CPATH=/opt/xpmem/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/xpmem/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/xpmem/lib:$LIBRARY_PATH
+
+# GDRCOPY
+%files from devel
+    /opt/gdrcopy /opt/gdrcopy
+%environment
+    export CPATH=/opt/gdrcopy/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/gdrcopy/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/gdrcopy/lib:$LIBRARY_PATH
+%post
+    export CPATH=/opt/gdrcopy/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/gdrcopy/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/gdrcopy/lib:$LIBRARY_PATH
+
+# UCX
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libbinutils
+    rm -rf /var/lib/apt/lists/*
+%files from devel
+    /opt/ucx /opt/ucx
+%environment
+    export CPATH=/opt/ucx/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/ucx/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/ucx/lib:$LIBRARY_PATH
+    export PATH=/opt/ucx/bin:$PATH
+%post
+    export CPATH=/opt/ucx/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/ucx/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/ucx/lib:$LIBRARY_PATH
+    export PATH=/opt/ucx/bin:$PATH
+
+# PMIX
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libevent-2.* \
+        libevent-pthreads-2.*
+    rm -rf /var/lib/apt/lists/*
+%files from devel
+    /opt/pmix /opt/pmix
+%environment
+    export CPATH=/opt/pmix/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/pmix/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/pmix/bin:$PATH
+%post
+    export CPATH=/opt/pmix/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/pmix/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/pmix/bin:$PATH
+
+# OpenMPI
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        hwloc \
+        openssh-client
+    rm -rf /var/lib/apt/lists/*
+%files from devel
+    /opt/openmpi /opt/openmpi
+%environment
+    export LD_LIBRARY_PATH=/opt/openmpi/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/openmpi/bin:$PATH
+%post
+    export LD_LIBRARY_PATH=/opt/openmpi/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/openmpi/bin:$PATH
+
+# https://ftp.mcs.anl.gov/pub/pdetools/spack-pkgs/parmetis-4.0.3.tar.gz
+%files from devel
+    /opt/parmetis /opt/parmetis
+%environment
+    export CPATH=/opt/parmetis/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/parmetis/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/parmetis/lib:$LIBRARY_PATH
+    export PATH=/opt/parmetis/bin:$PATH
+%post
+    export CPATH=/opt/parmetis/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/parmetis/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/parmetis/lib:$LIBRARY_PATH
+    export PATH=/opt/parmetis/bin:$PATH
+
+# https://gmsh.info/src/gmsh-4.13.1-source.tgz
+%files from devel
+    /opt/gmsh /opt/gmsh
+%environment
+    export PATH=/opt/gmsh/bin:$PATH
+%post
+    export PATH=/opt/gmsh/bin:$PATH
+
+# https://github.com/hypre-space/hypre/archive/refs/tags/v2.32.0.tar.gz
+%files from devel
+    /opt/hypre /opt/hypre
+%environment
+    export CMAKE_PREFIX_PATH=/opt/hypre:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/hypre/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/hypre/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/hypre/lib:$LIBRARY_PATH
+    export PATH=/opt/hypre/bin:$PATH
+%post
+    export CMAKE_PREFIX_PATH=/opt/hypre:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/hypre/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/hypre/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/hypre/lib:$LIBRARY_PATH
+    export PATH=/opt/hypre/bin:$PATH
+
+# https://github.com/sakov/nn-c/archive/refs/tags/v1.85.0.tar.gz
+%files from devel
+    /opt/nn /opt/nn
+%environment
+    export CPATH=/opt/nn/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/nn/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/nn/lib:$LIBRARY_PATH
+    export PATH=/opt/nn/bin:$PATH
+%post
+    export CPATH=/opt/nn/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/nn/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/nn/lib:$LIBRARY_PATH
+    export PATH=/opt/nn/bin:$PATH
+
+# https://github.com/sakov/csa-c/archive/refs/tags/v1.22.0.tar.gz
+%files from devel
+    /opt/csa /opt/csa
+%environment
+    export CMAKE_PREFIX_PATH=/opt/csa:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/csa/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/csa/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/csa/lib:$LIBRARY_PATH
+    export PATH=/opt/csa/bin:$PATH
+%post
+    export CMAKE_PREFIX_PATH=/opt/csa:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/csa/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/csa/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/csa/lib:$LIBRARY_PATH
+    export PATH=/opt/csa/bin:$PATH
+
+# https://github.com/MmgTools/mmg/archive/refs/tags/v5.8.0.tar.gz
+%files from devel
+    /opt/mmg /opt/mmg
+%environment
+    export CPATH=/opt/mmg/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/mmg/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/mmg/lib:$LIBRARY_PATH
+    export MMG_DIR=/opt/mmg
+    export PATH=/opt/mmg/bin:$PATH
+%post
+    export CPATH=/opt/mmg/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/mmg/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/mmg/lib:$LIBRARY_PATH
+    export MMG_DIR=/opt/mmg
+    export PATH=/opt/mmg/bin:$PATH
+
+# https://github.com/MmgTools/ParMmg/archive/refs/tags/v1.5.0.tar.gz
+%files from devel
+    /opt/parmmg /opt/parmmg
+%environment
+    export CPATH=/opt/parmmg/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/parmmg/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/parmmg/lib:$LIBRARY_PATH
+    export PARMMG_DIR=/opt/parmmg
+    export PATH=/opt/parmmg/bin:$PATH
+%post
+    export CPATH=/opt/parmmg/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/parmmg/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/parmmg/lib:$LIBRARY_PATH
+    export PARMMG_DIR=/opt/parmmg
+    export PATH=/opt/parmmg/bin:$PATH
+
+# AMGX
+%files from devel
+    /opt/amgx /opt/amgx
+%environment
+    export CPATH=/opt/amgx/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/amgx/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/amgx/lib:$LIBRARY_PATH
+%post
+    export CPATH=/opt/amgx/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/amgx/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/amgx/lib:$LIBRARY_PATH
+
+# https://www.lua.org/ftp/lua-5.4.7.tar.gz
+%files from devel
+    /opt/lua /opt/lua
+%environment
+    export CMAKE_PREFIX_PATH=/opt/lua:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/lua/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/lua/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/lua/lib:$LIBRARY_PATH
+    export PATH=/opt/lua/bin:$PATH
+%post
+    export CMAKE_PREFIX_PATH=/opt/lua:$CMAKE_PREFIX_PATH
+    export CPATH=/opt/lua/include:$CPATH
+    export LD_LIBRARY_PATH=/opt/lua/lib:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/lua/lib:$LIBRARY_PATH
+    export PATH=/opt/lua/bin:$PATH
+
+# https://github.com/ElmerCSC/elmerfem.git
+%files from devel
+    /opt/elmer /opt/elmer
+%environment
+    export LD_LIBRARY_PATH=/opt/elmer/lib::$LIBRARY_PATH
+    export LIBRARY_PATH=/opt/elmer/lib:$LIBRARY_PATH
+    export PATH=/opt/elmer/bin:$PATH
+%post
+    export LD_LIBRARY_PATH=/opt/elmer/lib::$LIBRARY_PATH
+    export LIBRARY_PATH=/opt/elmer/lib:$LIBRARY_PATH
+    export PATH=/opt/elmer/bin:$PATH
+
+# Libraries missing from CUDA runtime image
+
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        gcc-13-offload-nvptx \
+        gfortran \
+        libcurl4 \
+        libgomp1 \
+        libnuma1 \
+        zlib1g \
+        zlib1g-dev
+    rm -rf /var/lib/apt/lists/*
+
+%post
+    apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libblas-dev \
+        libcholmod5 \
+        libgomp1 \
+        liblapack-dev \
+        libmetis-dev \
+        libnetcdf-dev \
+        libnetcdff-dev \
+        libsuitesparse-dev \
+        libumfpack6
+    rm -rf /var/lib/apt/lists/*

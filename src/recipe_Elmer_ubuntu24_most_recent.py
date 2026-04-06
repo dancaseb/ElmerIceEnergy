@@ -414,7 +414,7 @@ elmer_toolchain = hpccm.toolchain(LDFLAGS="-lcurl")
 elmer = hpccm.building_blocks.generic_cmake(
     repository="https://github.com/ElmerCSC/elmerfem.git",
     branch="devel",
-    commit="9dce9c2ac192b50fd29f00bef746debac1a8018e",
+    commit="7b073597d1c1df84367f1dfaa44972306643a311",
     recursive=True,
     toolchain=elmer_toolchain,
     prefix=elmer_prefix,
