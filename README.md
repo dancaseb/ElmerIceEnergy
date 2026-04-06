@@ -57,6 +57,9 @@ The results are summarized in the plots below:
 
 The data can be found in `results/Leonardo/data.csv` produced using the scripts in `scripts/Leonardo` and analyzed using `analysis/plot.py`
 
+As shown, running Elmer/Ice with the Greenland SSA test case on Leonardo Booster significantly benefits from NVIDIA MPS. 
+Enabling MPS yields up to a 2x speedup in Time to Solution while also reducing the Energy to Solution by approximately half compared to the baseline configuration.
+
 # Segmentation Fault with elmerfem most recent commit
 
 The same scripts that produce the results above, crash with Segmentation Fault when running on a container with the most recent elmerfem commit:

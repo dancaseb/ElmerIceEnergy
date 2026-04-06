@@ -52,16 +52,17 @@ def plot(dframe, y_axis_str, outfilename):
     # ---- Labels ----
     if y_axis_str == "TOTAL_TIME":
         y_lab = "Time To Solution [s]"
-        title_lab = "Elmer/Ice Greenland_SSA: Execution Time Breakdown"
+        title_lab = "Elmer/Ice Greenland SSA: Execution Time Breakdown"
 
     if y_axis_str == "TOTAL_ENERGY":
         y_lab = "Energy To Solution [J]"
-        title_lab = "Elmer/Ice Greenland_SSA: Execution Energy Breakdown"
+        title_lab = "Elmer/Ice Greenland SSA: Execution Energy Breakdown"
 
     if y_axis_str == "EDP":
         y_lab = "Energy-Delay Product [J * s]"
-        title_lab = "Elmer/Ice Greenland_SSA: Execution Energy-Delay Product Breakdown"
-
+        title_lab = "Elmer/Ice Greenland SSA: Execution Energy-Delay Product Breakdown"
+    
+    ax.set_yscale("log")
     ax.set_ylabel(y_lab)
     ax.set_title(title_lab)
 

@@ -12,3 +12,6 @@ runs/
 
 **.err
 **.out
+!scripts/Leonardo_most_recent/run_Elmer_leonardo_N1_n4_c8_ML3_most_recent_39212184.err
+!scripts/Leonardo_most_recent/run_Elmer_leonardo_N1_n4_c8_ML3_most_recent_39212184.out
+
