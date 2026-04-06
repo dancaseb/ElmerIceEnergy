@@ -1,0 +1,456 @@
+Greenland_SSA/
+Greenland_SSA/SSA.IN
+Greenland_SSA/amgx_cg_dilu.json
+Greenland_SSA/MESH/
+Greenland_SSA/MESH/restart.result
+Greenland_SSA/MESH/mesh.nodes
+Greenland_SSA/MESH/mesh.boundary
+Greenland_SSA/MESH/mesh.header
+Greenland_SSA/MESH/mesh.elements
+Greenland_SSA/Physical_Params.IN
+Greenland_SSA/SSA_amgx_ML5.sif
+Greenland_SSA/SSA_amgx_ML4.sif
+Greenland_SSA/SSA_amgx_ML3.sif
+Greenland_SSA/Scalar_OUTPUT.F90
+==================================================================
+ElmerGrid mesh conversion and manipulation utility, Welcome!
+Version: 26.1 (Rev: NA, Compiled: NA)
+This program is free software licensed under GPL
+==================================================================
+Elmergrid reading in-line arguments
+Using dual (elemental) graph in partitioning.
+The mesh will be partitioned with Metis to 4 partitions.
+Output will be saved to file MESH.
+
+Elmergrid loading data:
+-----------------------
+Loading mesh in ElmerSolver format from directory MESH.
+Loading header from mesh.header
+Maximum elementtype index is: 303
+Maximum number of nodes in element is: 3
+Allocating for 195170 knots and 372241 elements.
+Loading 195170 Elmer nodes from mesh.nodes
+Loading 372241 bulk elements from mesh.elements
+Loading 18203 boundary elements from mesh.boundary
+Elmer mesh loaded successfully
+
+Elmergrid creating and manipulating meshes:
+-------------------------------------------
+Coordinates defined in 2 dimensions
+
+Elmergrid partitioning meshes:
+------------------------------
+Making a Metis partitioning for 195170 nodes in 2-dimensions.
+Setting default Metis options!
+Setting user defined Metis options!
+Creating a dual graph of the finite element mesh
+Creating an inverse topology of the finite element mesh
+There are from 2 to 21 connections in the inverse topology.
+Each node is in average in 5.722 elements
+Removing connected nodes from the dual graph
+List of unconnected elements created
+Allocating for the dual graph for 372241 with 4484118 connections
+There are at maximum 39 connections in dual graph (in element 236370).
+There are at all in all 4484118 connections in dual graph.
+Average connection per active element in dual graph is 12.046
+There are 4484118 connections altogether in the graph.
+Starting graph partitioning METIS_PartGraphKway.
+ Runtime parameters:
+   Objective type: METIS_OBJTYPE_CUT
+   Coarsening type: METIS_CTYPE_SHEM
+   Initial partitioning type: METIS_IPTYPE_METISRB
+   Refinement type: METIS_RTYPE_GREEDY
+   Perform a 2-hop matching: No
+   Number of balancing constraints: 1
+   Number of refinement iterations: 10
+   Random number seed: -1
+   Number of partitions: 4
+   Number of cuts: 1
+   User-supplied ufactor: 30
+   Minimize connectivity: No
+   Create contigous partitions: No
+   Target partition weights: 
+        0=[2.50e-01]   1=[2.50e-01]   2=[2.50e-01]   3=[2.50e-01]
+   Allowed maximum load imbalance: 1.030 
+
+
+ gk_mcore statistics
+           coresize:      5956072         nmops:         2048  cmop:      0
+        num_callocs:           33   num_hallocs:            0
+       size_callocs:      9322976  size_hallocs:            0
+        cur_callocs:            0   cur_hallocs:            0
+        max_callocs:      3101248   max_hallocs:            0
+ nbrpool statistics
+        nbrpoolsize:            0   nbrpoolcpos:            0
+    nbrpoolreallocs:            0
+
+
+Timing Information -------------------------------------------------
+ Multilevel: 		   0.183
+     Coarsening: 		   0.138
+            Matching: 			   0.043
+            Contract: 			   0.092
+     Initial Partition: 	   0.023
+     Uncoarsening: 		   0.021
+          Refinement: 			   0.002
+          Projection: 			   0.018
+     Splitting: 		   0.000
+********************************************************************
+
+ gk_mcore statistics
+           coresize:      5956072         nmops:         2048  cmop:      0
+        num_callocs:           62   num_hallocs:            0
+       size_callocs:     12387808  size_hallocs:            0
+        cur_callocs:            0   cur_hallocs:            0
+        max_callocs:      5955936   max_hallocs:            0
+ nbrpool statistics
+        nbrpoolsize:        99800   nbrpoolcpos:        13894
+    nbrpoolreallocs:            0
+
+Finished Metis graph partitioning call.
+Number of nodal partitions: 4
+Set the node partitions by the dominating element partition.
+There are from 95291 to 99762 nodes in the 4 partitions.
+Successfully made a Metis partition using the dual graph.
+Optimizing the partitioning at boundaries.
+Ownership of 0 parents was changed at BCs
+Optimizing for 4 partitions
+Creating a table showing all parenting partitions of nodes.
+Nodes belong to 3 partitions in maximum
+There are 225 shared nodes which is 0.12 % of all nodes.
+The initial owner was not any of the elements for 0 nodes
+Checking partitioning before optimization
+Checking for partitioning
+Information on partition bandwidth
+Distribution of elements, nodes and shared nodes
+     partition  elements   nodes      shared    
+     1          93023      49898      30        
+     2          92859      49673      61        
+     3          92512      47684      77        
+     4          93847      47915      59        
+Average number of elements in partition 4.879e+04
+Maximum deviation in ownership 2214
+Average deviation in ownership 9.995e+02
+Average relative deviation 2.05 %
+Checking for problematic sharings
+Optimizing sharing for 4 partitions
+There shouldn't be any problematic sharings, knock, knock...
+Partitioning was not altered
+Partitioning routines finished!
+Bounding box of all nodes in mesh:
+X:[-625925,848575] Y:[-3.33118e+06,-667175] Z:[0,0]
+
+Notice: the longest bounding box side length of [2.664e+06] is greater than 50.
+ElmerGUI includes a library of material properties, defined in SI units.  If using ElmerGUI, 
+then the geometry is expected to have meters as length.  Geometry that exceeds 50 meters 
+in length or width or height may not be intended.  Many Geometry generators assume 
+millimeters as the basic unit of length.  Scaling the geometry from millimeters to meters 
+may be the desired action.  For more help, search the Elmer users forum for posts 
+about SI units, or for posts about Coordinate Scaling.
+Scaling can be accomplished in at least three ways, as follows:
+ 1. Define the original geometry in meters, not millimeters.
+ 2. Call ElmerGrid with -scale 0.001 0.001 0.001 as an option.
+ 3. Add Coordinate Scaling = 0.001 to the simulation section of the sif file.
+If using Elmer to analyze large geometry, such as a glacier, then ignore this notice.
+
+Calculate Mesh Pieces in mesh:
+There is a single piece in the mesh, so the mesh is conforming.
+
+Elmergrid saving data with method 2:
+-------------------------------------
+Saving Elmer mesh in partitioned format
+Number of boundary nodes at the boundary: 18178
+Number of additional interface nodes: 0
+Created subdirectory: partitioning.4
+Saving mesh in parallel ElmerSolver format to directory MESH/partitioning.4.
+Nodes belong to 3 partitions in maximum
+Saving mesh for 4 partitions
+   part  elements   nodes      shared   bc elems
+   1     93023      49898      30       6826    
+   2     92859      49673      61       6510    
+   3     92512      47684      77       2869    
+   4     93847      47915      59       1998    
+----------------------------------------------------------------------------------------------
+   ave   93060.2    48792.5    56.8     4550.8  
+Writing of partitioned mesh finished
+
+Thank you for using Elmergrid!
+Send bug reports and feature wishes to elmeradm@csc.fi
+with elmerice
+with MMG
+with ParMMG
+/usr/bin/gfortran Scalar_OUTPUT.F90 -o Scalar_OUTPUT -g -O2 -fPIC -fopenmp -foffload=nvptx-none=-march=sm_80 -fopenmp -fallow-argument-mismatch -DHAVE_NETCDF -DHAVE_MMG -DHAVE_PARMMG -DCONTIG= -DHAVE_EXECUTECOMMANDLINE -DUSE_ISO_C_BINDINGS -DUSE_ARPACK -O2 -g -fPIC -shared -I/opt/elmer/share/elmersolver/include -L/opt/elmer/share/elmersolver/../../lib/elmersolver -Xlinker -rpath=/opt/elmer/share/elmersolver/../../lib/elmersolver/../../share/elmersolver/lib /opt/elmer/share/elmersolver/../../lib/elmersolver/../../share/elmersolver/lib/ElmerIceSolvers.so /opt/elmer/share/elmersolver/../../lib/elmersolver/../../share/elmersolver/lib/ElmerIceUSF.so /opt/elmer/share/elmersolver/../../lib/elmersolver/../../share/elmersolver/lib/ElmerIceUtils.so -I/opt/mmg/include/ -L/opt/mmg/lib -I/opt/parmmg/include -L/opt/parmmg/lib -shared -lelmersolver 
+ELMER SOLVER (v 26.1) STARTED AT: 2026/04/06 16:49:24
+ELMER SOLVER (v 26.1) STARTED AT: 2026/04/06 16:49:24
+ELMER SOLVER (v 26.1) STARTED AT: 2026/04/06 16:49:24
+ELMER SOLVER (v 26.1) STARTED AT: 2026/04/06 16:49:24
+ParCommInit: Initialize #PEs: 4
+ParCommInit: Initialize #PEs: 4
+MAIN: 
+ParCommInit: Initialize #PEs: 4
+ParCommInit: Initialize #PEs: 4
+MAIN: =============================================================
+MAIN: ElmerSolver finite element software, Welcome!
+MAIN: This program is free software licensed under (L)GPL
+MAIN: Copyright 1st April 1995 - , CSC - IT Center for Science Ltd.
+MAIN: Webpage http://www.csc.fi/elmer, Email elmeradm@csc.fi
+MAIN: Version: 26.1-unknown (Rev: 7b073597d, Compiled: 2026-04-06)
+MAIN:  Running in parallel using 4 tasks.
+MAIN:  Running in parallel with 8 threads per task.
+MAIN:  HYPRE library linked in.
+MAIN:  CHOLMOD library linked in.
+MAIN:  MMG library linked in.
+MAIN:  ParMMG library linked in.
+MAIN:  Lua interpreter linked in.
+MAIN:  Zoltan library linked in.
+MAIN:  AMGX library linked in.
+MAIN: =============================================================
+OpenIncludeFile: Trying to include file: SSA.IN
+OpenIncludeFile: Trying to include file: Physical_Params.IN
+MAIN: 
+MAIN: 
+MAIN: -------------------------------------
+MAIN: Reading Model: SSA_amgx_ML3.sif
+LoadInputFile: Scanning input file: SSA_amgx_ML3.sif
+LoadInputFile: Scanning only size info
+LoadInputFile: First time visiting
+LoadInputFile: Reading base load of sif file
+OpenIncludeFile: Trying to include file: SSA.IN
+OpenIncludeFile: Trying to include file: Physical_Params.IN
+CheckKeyword: Found keyword type assuming suffix 1 for: exported variable 2
+CheckKeyword: Found keyword type assuming suffix 1 for: exported variable 2
+CheckKeyword: Found keyword type assuming suffix 1 for: variable 2
+CheckKeyword: Found keyword type assuming suffix 1 for: variable 2
+CheckKeyword: Found keyword type assuming suffix 1 for: operator 2
+CheckKeyword: Found keyword type assuming suffix 1 for: operator 2
+CheckKeyword: Found keyword type assuming suffix 1 for: operator 3
+CheckKeyword: Found keyword type assuming suffix 1 for: operator 3
+LoadInputFile: Loading input file: SSA_amgx_ML3.sif
+LoadInputFile: Reading base load of sif file
+OpenIncludeFile: Trying to include file: SSA.IN
+OpenIncludeFile: Trying to include file: Physical_Params.IN
+CheckKeyword:  Unlisted keyword: [sea level] in section: [constants]
+CheckKeyword:  Unlisted keyword: [water density] in section: [constants]
+CheckKeyword:  Unlisted keyword: [bottom surface accumulation] in section: [body force 1]
+CheckKeyword:  Unlisted keyword: [ssa mean density] in section: [material 1]
+CheckKeyword:  Unlisted keyword: [ssa critical thickness] in section: [material 1]
+CheckKeyword:  Unlisted keyword: [ssa friction law] in section: [material 1]
+CheckKeyword:  Unlisted keyword: [min h] in section: [material 1]
+CheckKeyword:  Unlisted keyword: [restart position] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart time] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 1] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 2] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 3] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 4] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 5] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 6] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 7] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 8] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 9] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart variable 10] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [restart before initial condition] in section: [solver 1]
+CheckKeyword:  Unlisted keyword: [amgx config] in section: [solver 3]
+CheckKeyword:  Unlisted keyword: [velocity norm limit] in section: [solver 3]
+CheckKeyword:  Unlisted keyword: [sub-element gl parameterization] in section: [solver 3]
+CheckKeyword:  Unlisted keyword: [gl integration points number] in section: [solver 3]
+CheckKeyword: Found keyword type assuming suffix 1 for: exported variable 2
+CheckKeyword: Found keyword type assuming suffix 1 for: exported variable 2
+CheckKeyword:  Unlisted keyword: [compute dhdt] in section: [solver 4]
+CheckKeyword:  Unlisted keyword: [transient stabilisation] in section: [solver 4]
+CheckKeyword:  Unlisted keyword: [file name] in section: [solver 5]
+CheckKeyword: Found keyword type assuming suffix 1 for: variable 2
+CheckKeyword: Found keyword type assuming suffix 1 for: variable 2
+CheckKeyword: Found keyword type assuming suffix 1 for: operator 2
+CheckKeyword: Found keyword type assuming suffix 1 for: operator 2
+CheckKeyword: Found keyword type assuming suffix 1 for: operator 3
+CheckKeyword: Found keyword type assuming suffix 1 for: operator 3
+CheckKeyword:  Unlisted keyword: [calving front] in section: [boundary condition 1]
+LoadInputFile: Number of BCs: 1
+LoadInputFile: Number of Body Forces: 1
+LoadInputFile: Number of Initial Conditions: 0
+LoadInputFile: Number of Materials: 1
+LoadInputFile: Number of Equations: 1
+LoadInputFile: Number of Solvers: 6
+LoadInputFile: Number of Bodies: 1
+ListTagKeywords: Setting weight for keywords!
+ListTagKeywords: No parameters width suffix: normalize by area
+ListTagKeywords: Setting weight for keywords!
+ListTagKeywords: No parameters width suffix: normalize by volume
+Loading user function library: [Mesh2MeshSolver]...[Mesh2MeshSolver_Init0]
+Loading user function library: [ElmerIceSolvers]...[Flotation_Init0]
+Loading user function library: [ElmerIceSolvers]...[Flotation_Init0]
+Loading user function library: [ElmerIceSolvers]...[SSABasalSolver_Init0]
+Loading user function library: [ElmerIceSolvers]...[SSABasalSolver_Init0]
+Loading user function library: [ElmerIceSolvers]...[ThicknessSolver_Init0]
+Loading user function library: [ElmerIceSolvers]...[ThicknessSolver_Init0]
+Loading user function library: [Scalar_OUTPUT]...[Scalar_OUTPUT_Init0]
+Loading user function library: [Scalar_OUTPUT]...[Scalar_OUTPUT_Init0]
+Loading user function library: [SaveData]...[SaveScalars_Init0]
+Loading user function library: [SaveData]...[SaveScalars_Init0]
+LoadMesh: Loading parallel mesh for 4 partitions
+ElmerMeshReader: Performing step: 1
+ElmerMeshReader: Base mesh name: ./MESH
+ReadHeaderFile: Reading header info from file: ./MESH/partitioning.4/part.1.header
+InitializeMesh: Number of nodes in mesh: 49928
+InitializeMesh: Number of bulk elements in mesh: 93023
+InitializeMesh: Number of boundary elements in mesh: 6826
+InitializeMesh: Initial number of max element nodes: 3
+ElmerMeshReader: Performing step: 2
+ReadNodesFile: Reading nodes from file: ./MESH/partitioning.4/part.1.nodes
+SetMeshDimension: Dimension of mesh is: 2
+SetMeshDimension: Max dimension of mesh is: 2
+ElmerMeshReader: Performing step: 3
+ReadElementsFile: Reading bulk elements from file: ./MESH/partitioning.4/part.1.elements
+ElmerMeshReader: Performing step: 4
+ReadBoundaryFile: Reading boundary elements from file: ./MESH/partitioning.4/part.1.boundary
+PermuteNodeNumbering: Performing node mapping
+MapBodiesAndBCs: Skipping remapping of bodies
+MapBodiesAndBCs: Remapping boundaries
+MapBodiesAndBCs: Minimum initial boundary index: 1
+MapBodiesAndBCs: Maximum initial boundary index: 1
+ElmerMeshReader: Performing step: 5
+ReadSharedFile: Reading nodes from file: ./MESH/partitioning.4/part.1.shared
+ElmerMeshReader: Performing step: 6
+LoadMesh: Loading mesh done
+NonNodalElements: Element dofs max: 3
+PrepareMesh: Generating parallel communications for the non-nodal mesh
+SParFaceNumbering: Elapsed REAL time:     0.0011 (s)
+SParEdgeNumbering: Elapsed REAL time:     0.0000 (s)
+ParallelNonNodalElements: Number of initial nodes: 49928
+ParallelNonNodalElements: Number of initial faces: 0
+ParallelNonNodalElements: Number of initial edges: 0
+ParallelNonNodalElements: Number of shared nodes: 64
+ParallelNonNodalElements: Number of owned shared nodes: 34
+ParallelNonNodal: Elapsed REAL time:     0.0040 (s)
+PrintMeshSize: Number of parallel mesh entities:   SUM       MIN       MAX
+PrintMeshSize:   Bulk elements:                 372241     92512     93847
+PrintMeshSize:   Boundary elements:              18203      1998      6826
+PrintMeshSize:   Total nodes:                   195397     47761     49928
+PrintMeshSize:   Owned nodes:                   195170     47684     49898
+PrintMeshSize:   Shared nodes:                     452        64       154
+LoadMesh: Preparing mesh done
+LoadMesh: Elapsed REAL time:     0.1451 (s)
+LoadModel: Creating hierarchy of meshes by mesh multiplication: 3
+LoadModel: Keeping number of meshes: 3
+LoadModel: Performing splitting at level: 2
+SplitMeshEqual: Mesh splitting works for first order elements 303, 404, 504, (706) and 808.
+FindMeshEdges: Determining edges in 2D mesh
+FindMeshEdges2D: Finding mesh edges in 2D mesh
+FindMeshEdges2D: Creating hash table of size 49928 for node-to-node connectivity
+FindMeshEdges2D: Allocating edge table of size: 142979
+FindMeshEdges2D: Number of edges found: 142979
+FindMeshEdges2D: All done
+SplitMeshEqual: ******** Old mesh ********
+SplitMeshEqual:  Nodes             :        49928
+SplitMeshEqual:  Bulk elements     :        93023
+SplitMeshEqual:  Boundary elements :         6826
+SplitMeshEqual:  Edges             :       142979
+SplitMeshEqual:  Faces             :            0
+SplitMeshEqual: Added edge centers to the nodes list.
+SplitMeshEqual: Added face centers to the nodes list.
+SplitMeshEqual: Added quad and brick centers to the nodes list.
+SplitMeshEqual:  Count of new elements :       385744
+SplitMeshEqual: New mesh allocated.
+SplitMeshEqual: Array for bulk elements allocated.
+SplitMeshEqual: ******** New mesh ********
+SplitMeshEqual:  Nodes             :       192907
+SplitMeshEqual:  Bulk elements     :       372092
+SplitMeshEqual:  Boundary elements :        13652
+SplitMeshEqual: Elapsed REAL time:     0.1158 (s)
+SParIterGlobalNumbering:  Numbering seems consistent, advancing...
+ParallelGlobalNumbering: Elapsed REAL time:     0.1031 (s)
+SplitMeshEqual: Releasing edges from the old mesh as they are not needed!
+SetMeshDimension: Dimension of mesh is: 2
+SetMeshDimension: Max dimension of mesh is: 2
+NonNodalElements: Element dofs max: 3
+PrepareMesh: Generating parallel communications for the non-nodal mesh
+SParFaceNumbering: Elapsed REAL time:     0.0000 (s)
+SParEdgeNumbering: Elapsed REAL time:     0.0000 (s)
+ParallelNonNodalElements: Number of initial nodes: 192907
+ParallelNonNodalElements: Number of initial faces: 0
+ParallelNonNodalElements: Number of initial edges: 0
+ParallelNonNodalElements: Number of shared nodes: 127
+ParallelNonNodalElements: Number of owned shared nodes: 97
+ParallelNonNodal: Elapsed REAL time:     0.0072 (s)
+PrintMeshSize: Number of parallel mesh entities:   SUM       MIN       MAX
+PrintMeshSize:   Bulk elements:                1488964    370048    375388
+PrintMeshSize:   Boundary elements:              36406      3996     13652
+PrintMeshSize:   Total nodes:                   763084    188040    192907
+PrintMeshSize:   Owned nodes:                   762633    187883    192877
+PrintMeshSize:   Shared nodes:                     900       127       307
+LoadModel: Performing splitting at level: 3
+SplitMeshEqual: Mesh splitting works for first order elements 303, 404, 504, (706) and 808.
+FindMeshEdges: Determining edges in 2D mesh
+FindMeshEdges2D: Finding mesh edges in 2D mesh
+FindMeshEdges2D: Creating hash table of size 192907 for node-to-node connectivity
+FindMeshEdges2D: Allocating edge table of size: 565027
+FindMeshEdges2D: Number of edges found: 565027
+FindMeshEdges2D: All done
+SplitMeshEqual: ******** Old mesh ********
+SplitMeshEqual:  Nodes             :       192907
+SplitMeshEqual:  Bulk elements     :       372092
+SplitMeshEqual:  Boundary elements :        13652
+SplitMeshEqual:  Edges             :       565027
+SplitMeshEqual:  Faces             :            0
+SplitMeshEqual: Added edge centers to the nodes list.
+SplitMeshEqual: Added face centers to the nodes list.
+SplitMeshEqual: Added quad and brick centers to the nodes list.
+SplitMeshEqual:  Count of new elements :      1515672
+SplitMeshEqual: New mesh allocated.
+SplitMeshEqual: Array for bulk elements allocated.
+SplitMeshEqual: ******** New mesh ********
+SplitMeshEqual:  Nodes             :       757934
+SplitMeshEqual:  Bulk elements     :      1488368
+SplitMeshEqual:  Boundary elements :        27304
+SplitMeshEqual: Elapsed REAL time:     0.4501 (s)
+SParIterGlobalNumbering:  Numbering seems consistent, advancing...
+ParallelGlobalNumbering: Elapsed REAL time:     0.3851 (s)
+SplitMeshEqual: Releasing edges from the old mesh as they are not needed!
+SetMeshDimension: Dimension of mesh is: 2
+SetMeshDimension: Max dimension of mesh is: 2
+NonNodalElements: Element dofs max: 3
+PrepareMesh: Generating parallel communications for the non-nodal mesh
+SParFaceNumbering: Elapsed REAL time:     0.0000 (s)
+SParEdgeNumbering: Elapsed REAL time:     0.0000 (s)
+ParallelNonNodalElements: Number of initial nodes: 757934
+ParallelNonNodalElements: Number of initial faces: 0
+ParallelNonNodalElements: Number of initial edges: 0
+ParallelNonNodalElements: Number of shared nodes: 253
+ParallelNonNodalElements: Number of owned shared nodes: 223
+ParallelNonNodal: Elapsed REAL time:     0.0289 (s)
+PrintMeshSize: Number of parallel mesh entities:   SUM       MIN       MAX
+PrintMeshSize:   Bulk elements:                5955856   1480192   1501552
+PrintMeshSize:   Boundary elements:              72812      7992     27304
+PrintMeshSize:   Total nodes:                  3015181    746134    757934
+PrintMeshSize:   Owned nodes:                  3014282    745817    757904
+PrintMeshSize:   Shared nodes:                    1796       253       613
+LoadModel: Loading solver specific mesh > -single MESH < for solver 1
+LoadModel: Whole mesh will be read for each partition!
+LoadModel: Skipping tests whether the mesh with same name exists!
+LoadMesh: Loading serial mesh!
+ElmerMeshReader: Performing step: 1
+ElmerMeshReader: Base mesh name: MESH
+ReadHeaderFile: Reading header info from file: MESH/mesh.header
+InitializeMesh: Number of nodes in mesh: 195170
+InitializeMesh: Number of bulk elements in mesh: 372241
+InitializeMesh: Number of boundary elements in mesh: 18203
+InitializeMesh: Initial number of max element nodes: 3
+ElmerMeshReader: Performing step: 2
+ReadNodesFile: Reading nodes from file: MESH/mesh.nodes
+SetMeshDimension: Dimension of mesh is: 2
+SetMeshDimension: Max dimension of mesh is: 2
+ElmerMeshReader: Performing step: 3
+ReadElementsFile: Reading bulk elements from file: MESH/mesh.elements
+ElmerMeshReader: Performing step: 4
+ReadBoundaryFile: Reading boundary elements from file: MESH/mesh.boundary
+PermuteNodeNumbering: Performing node mapping
+MapBodiesAndBCs: Skipping remapping of bodies
+MapBodiesAndBCs: Remapping boundaries
+MapBodiesAndBCs: Minimum initial boundary index: 1
+MapBodiesAndBCs: Maximum initial boundary index: 1
+ElmerMeshReader: Performing step: 5
+ElmerMeshReader: Performing step: 6
+LoadMesh: Loading mesh done
+NonNodalElements: Element dofs max: 3
+Elapsed time: 8 s
+-----------------------------------

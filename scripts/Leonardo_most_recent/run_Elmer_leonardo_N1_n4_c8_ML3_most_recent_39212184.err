@@ -1,0 +1,151 @@
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LC_CTYPE = "UTF-8",
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
+Loading openmpi/4.1.6--gcc--12.2.0
+  Loading requirement: gcc/12.2.0-binut2.41
+[lrdn0118:3703131:0:3703131] Caught signal 11 (Segmentation fault: address not mapped to object at address 0x8)
+[lrdn0118:3703194:0:3703194] Caught signal 11 (Segmentation fault: address not mapped to object at address 0x8)
+[lrdn0118:3703232:0:3703232] Caught signal 11 (Segmentation fault: address not mapped to object at address 0x8)
+[lrdn0118:3703212:0:3703212] Caught signal 11 (Segmentation fault: address not mapped to object at address 0x8)
+==== backtrace (tid:3703131) ====
+ 0 0x0000000000045330 __sigaction()  ???:0
+ 1 0x00000000015c07d2 __meshutils_MOD_printmeshsize()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:8427
+ 2 0x000000000160cede __meshutils_MOD_preparemesh()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:3306
+ 3 0x000000000161917a __meshutils_MOD_loadmesh2()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:2808
+ 4 0x000000000134c932 __modeldescription_MOD_loadmodel()  /var/tmp/elmerfem/fem/src/ModelDescription.F90:3180
+ 5 0x0000000001825324 elmersolver_()  /var/tmp/elmerfem/fem/src/ElmerSolver.F90:407
+ 6 0x0000000000001556 MAIN__()  /var/tmp/elmerfem/fem/src/Solver.F90:91
+ 7 0x00000000000011cf main()  /var/tmp/elmerfem/fem/src/Solver.F90:34
+ 8 0x000000000002a1ca __libc_init_first()  ???:0
+ 9 0x000000000002a28b __libc_start_main()  ???:0
+10 0x0000000000001205 _start()  ???:0
+=================================
+
+Program received signal SIGSEGV: Segmentation fault - invalid memory reference.
+
+Backtrace for this error:
+==== backtrace (tid:3703194) ====
+ 0 0x0000000000045330 __sigaction()  ???:0
+ 1 0x00000000015c07d2 __meshutils_MOD_printmeshsize()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:8427
+ 2 0x000000000160cede __meshutils_MOD_preparemesh()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:3306
+ 3 0x000000000161917a __meshutils_MOD_loadmesh2()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:2808
+ 4 0x000000000134c932 __modeldescription_MOD_loadmodel()  /var/tmp/elmerfem/fem/src/ModelDescription.F90:3180
+ 5 0x0000000001825324 elmersolver_()  /var/tmp/elmerfem/fem/src/ElmerSolver.F90:407
+ 6 0x0000000000001556 MAIN__()  /var/tmp/elmerfem/fem/src/Solver.F90:91
+ 7 0x00000000000011cf main()  /var/tmp/elmerfem/fem/src/Solver.F90:34
+ 8 0x000000000002a1ca __libc_init_first()  ???:0
+ 9 0x000000000002a28b __libc_start_main()  ???:0
+10 0x0000000000001205 _start()  ???:0
+=================================
+
+Program received signal SIGSEGV: Segmentation fault - invalid memory reference.
+
+Backtrace for this error:
+==== backtrace (tid:3703232) ====
+ 0 0x0000000000045330 __sigaction()  ???:0
+ 1 0x00000000015c07d2 __meshutils_MOD_printmeshsize()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:8427
+ 2 0x000000000160cede __meshutils_MOD_preparemesh()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:3306
+ 3 0x000000000161917a __meshutils_MOD_loadmesh2()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:2808
+ 4 0x000000000134c932 __modeldescription_MOD_loadmodel()  /var/tmp/elmerfem/fem/src/ModelDescription.F90:3180
+ 5 0x0000000001825324 elmersolver_()  /var/tmp/elmerfem/fem/src/ElmerSolver.F90:407
+ 6 0x0000000000001556 MAIN__()  /var/tmp/elmerfem/fem/src/Solver.F90:91
+ 7 0x00000000000011cf main()  /var/tmp/elmerfem/fem/src/Solver.F90:34
+ 8 0x000000000002a1ca __libc_init_first()  ???:0
+ 9 0x000000000002a28b __libc_start_main()  ???:0
+10 0x0000000000001205 _start()  ???:0
+=================================
+
+Program received signal SIGSEGV: Segmentation fault - invalid memory reference.
+
+Backtrace for this error:
+==== backtrace (tid:3703212) ====
+ 0 0x0000000000045330 __sigaction()  ???:0
+ 1 0x00000000015c07d2 __meshutils_MOD_printmeshsize()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:8427
+ 2 0x000000000160cede __meshutils_MOD_preparemesh()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:3306
+ 3 0x000000000161917a __meshutils_MOD_loadmesh2()  /var/tmp/elmerfem/fem/src/MeshUtils.F90:2808
+ 4 0x000000000134c932 __modeldescription_MOD_loadmodel()  /var/tmp/elmerfem/fem/src/ModelDescription.F90:3180
+ 5 0x0000000001825324 elmersolver_()  /var/tmp/elmerfem/fem/src/ElmerSolver.F90:407
+ 6 0x0000000000001556 MAIN__()  /var/tmp/elmerfem/fem/src/Solver.F90:91
+ 7 0x00000000000011cf main()  /var/tmp/elmerfem/fem/src/Solver.F90:34
+ 8 0x000000000002a1ca __libc_init_first()  ???:0
+ 9 0x000000000002a28b __libc_start_main()  ???:0
+10 0x0000000000001205 _start()  ???:0
+=================================
+
+Program received signal SIGSEGV: Segmentation fault - invalid memory reference.
+
+Backtrace for this error:
+#0  0x14ac0edf2e59 in ???
+#1  0x14ac0edf1e75 in ???
+#2  0x14ac0eb1932f in ???
+#3  0x14ac106b27d2 in __meshutils_MOD_printmeshsize
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:8428
+#4  0x14ac106feedd in __meshutils_MOD_preparemesh
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:3306
+#5  0x14ac1070b179 in __meshutils_MOD_loadmesh2
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:2808
+#6  0x14ac1043e931 in __modeldescription_MOD_loadmodel
+	at /var/tmp/elmerfem/fem/src/ModelDescription.F90:3180
+#7  0x14ac10917323 in elmersolver_
+	at /var/tmp/elmerfem/fem/src/ElmerSolver.F90:407
+#8  0x55c5e83e1555 in solver
+	at /var/tmp/elmerfem/fem/src/Solver.F90:91
+#9  0x55c5e83e11ce in main
+	at /var/tmp/elmerfem/fem/src/Solver.F90:34
+#0  0x153f54f63e59 in ???
+#1  0x153f54f62e75 in ???
+#2  0x153f54c8a32f in ???
+#3  0x153f568237d2 in __meshutils_MOD_printmeshsize
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:8428
+#4  0x153f5686fedd in __meshutils_MOD_preparemesh
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:3306
+#5  0x153f5687c179 in __meshutils_MOD_loadmesh2
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:2808
+#0  0x1478de427e59 in ???
+#1  0x1478de426e75 in ???
+#2  0x1478de14e32f in ???
+#6  0x153f565af931 in __modeldescription_MOD_loadmodel
+	at /var/tmp/elmerfem/fem/src/ModelDescription.F90:3180
+#7  0x153f56a88323 in elmersolver_
+	at /var/tmp/elmerfem/fem/src/ElmerSolver.F90:407
+#8  0x555b83aa0555 in solver
+	at /var/tmp/elmerfem/fem/src/Solver.F90:91
+#9  0x555b83aa01ce in main
+	at /var/tmp/elmerfem/fem/src/Solver.F90:34
+#3  0x1478dfce77d2 in __meshutils_MOD_printmeshsize
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:8428
+#4  0x1478dfd33edd in __meshutils_MOD_preparemesh
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:3306
+#5  0x1478dfd40179 in __meshutils_MOD_loadmesh2
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:2808
+#6  0x1478dfa73931 in __modeldescription_MOD_loadmodel
+	at /var/tmp/elmerfem/fem/src/ModelDescription.F90:3180
+#7  0x1478dff4c323 in elmersolver_
+	at /var/tmp/elmerfem/fem/src/ElmerSolver.F90:407
+#8  0x55bc00370555 in solver
+	at /var/tmp/elmerfem/fem/src/Solver.F90:91
+#9  0x55bc003701ce in main
+	at /var/tmp/elmerfem/fem/src/Solver.F90:34
+#0  0x14e8f9a98e59 in ???
+#1  0x14e8f9a97e75 in ???
+#2  0x14e8f97bf32f in ???
+#3  0x14e8fb3587d2 in __meshutils_MOD_printmeshsize
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:8428
+#4  0x14e8fb3a4edd in __meshutils_MOD_preparemesh
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:3306
+#5  0x14e8fb3b1179 in __meshutils_MOD_loadmesh2
+	at /var/tmp/elmerfem/fem/src/MeshUtils.F90:2808
+#6  0x14e8fb0e4931 in __modeldescription_MOD_loadmodel
+	at /var/tmp/elmerfem/fem/src/ModelDescription.F90:3180
+#7  0x14e8fb5bd323 in elmersolver_
+	at /var/tmp/elmerfem/fem/src/ElmerSolver.F90:407
+#8  0x55bb1784c555 in solver
+	at /var/tmp/elmerfem/fem/src/Solver.F90:91
+#9  0x55bb1784c1ce in main
+	at /var/tmp/elmerfem/fem/src/Solver.F90:34
+srun: error: lrdn0118: tasks 1-3: Segmentation fault
