@@ -9,3 +9,6 @@ Dockerfile
 
 # Exclude runs directory 
 runs/
+
+**.err
+**.out
