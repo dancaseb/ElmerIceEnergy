@@ -16,11 +16,14 @@ It provides fine-grained power sampling by leveraging hardware interfaces such a
 
 The container definitions have been produced by means of HPC Container Maker [HPCCM](https://github.com/NVIDIA/hpc-container-maker)
 
+
+- For the apptainer definition targetting Leonardo Booster (or in general `Intel x86_64` and `NVIDIA A100`) see `definitions/Elmer_ubuntu24_leonardo.def`
+
+- For the apptainer definition targetting Thea (or in general NVIDIA Grace-Hopper architecture) see `definitions/Elmer_ubuntu24_thea.def`
+
 # Results on Leonardo Booster
 
 The results below refer to `ElmerCSC/elmerfem@9dce9c2ac192b50fd29f00bef746debac1a8018e` obtained on Leonardo Booster partition.
-
-The apptainer container definition used can be found in `definitions/Elmer_ubuntu24_leonardo.def`
 
 Leonardo Booster one-node configuration:
 
