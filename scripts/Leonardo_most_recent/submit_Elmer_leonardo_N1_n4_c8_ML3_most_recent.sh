@@ -19,11 +19,11 @@ export PRESERVE_TIMESERIES=1
 export CINEMON="/leonardo_work/cin_emon/git/cinemon-public/build/cinemon"
 
 #MESH LEVEL
-export MESHLEVEL="ML3"
+export MESH_LEVEL="3"
 
 # DIR PATHS
 export BASEDIR="/leonardo_work/cin_emon/uc/Marco/ElmerIceEnergy"
-export RUNDIR="${BASEDIR}/runs/Leonardo_most_recent/run_Elmer_leonardo_N${SLURM_NNODES}_n${SLURM_NTASKS_PER_NODE}_c${SLURM_CPUS_PER_TASK}_${MESHLEVEL}_most_recent_${SLURM_JOB_ID}"
+export RUNDIR="${BASEDIR}/runs/Leonardo_most_recent/N${SLURM_NNODES}_n${SLURM_NTASKS_PER_NODE}_c${SLURM_CPUS_PER_TASK}_ML${MESH_LEVEL}/run_Elmer_leonardo_N${SLURM_NNODES}_n${SLURM_NTASKS_PER_NODE}_c${SLURM_CPUS_PER_TASK}_ML${MESH_LEVEL}_most_recent_${SLURM_JOB_ID}"
 export SCRIPTSDIR="${BASEDIR}/scripts"
 export CONTAINERSDIR="${BASEDIR}/containers"
 export INPUTSDIR="${BASEDIR}/inputs"
@@ -51,7 +51,7 @@ srun -N1 -n1 singularity exec -B ${GREENLAND} --nv ${CONTAINER} elmerf90 Scalar_
 
 # ELMERSOLVER
 start=$(date +%s)
-srun -n ${SLURM_NTASKS} --cpu-bind=cores --cpus-per-task=${SLURM_CPUS_PER_TASK} ${CINEMON} singularity exec -B ${GREENLAND} --env UCX_POSIX_USE_PROC_LINK=n --nv ${CONTAINER} ElmerSolver_mpi SSA_amgx_${MESHLEVEL}.sif
+srun -n ${SLURM_NTASKS} --cpu-bind=cores --cpus-per-task=${SLURM_CPUS_PER_TASK} ${CINEMON} singularity exec -B ${GREENLAND} --env UCX_POSIX_USE_PROC_LINK=n --nv ${CONTAINER} ElmerSolver_mpi SSA_amgx_ML${MESH_LEVEL}.sif
 end=$(date +%s)
 
 echo "Elapsed time: $(($end-$start)) s"
