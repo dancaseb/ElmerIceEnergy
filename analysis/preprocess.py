@@ -61,15 +61,15 @@ for root, dirs, files in os.walk(base_dir):
         # Add metadata columns
         for k, v in metadata.items():
             df[k] = v
-
         df["source_folder"] = root
         TOT_ENERGY = df["TOT_ENERGY"].sum()
         EXECUTION_TIME = df["EXECUTION_TIME"].max()
-        NODES = df["nodes"].max()
-        NTASKS_PER_NODE = df["ntasks_per_node"].max()
-        CPUS_PER_TASK = df["cpus_per_task"].max()
-        MESH_LEVEL = df["mesh_level"].max()
-        MPS = df["MPS"].max()
+        NODES = df["nodes"].unique()[0]
+        NTASKS_PER_NODE = df["ntasks_per_node"].unique()[0]
+        CPUS_PER_TASK = df["cpus_per_task"].unique()[0]
+        MESH_LEVEL = df["mesh_level"].unique()[0]
+        MPS = df["MPS"].unique()[0]
+        JOBID = df["jobid"].unique()[0]
         #except Exception as e:
         #    print(f"Skipping CSV parsing in {file_path}: {e}")
         #
@@ -82,6 +82,7 @@ for root, dirs, files in os.walk(base_dir):
         data_dict["MESH_LEVEL"]= MESH_LEVEL
         data_dict["MPS"]= MPS
         data_dict["ROOT"] = root
+        data_dict["JOBID"] = JOBID
         for line in energy_lines:
             if ":" in line:
                 key, value = line.split(":", 1)
@@ -98,6 +99,6 @@ df.rename(columns={'Total energy consumed by the job': 'TOTAL_ENERGY', 'EXECUTIO
 #print(combined_df.head())
 df["EDP"]  = df["TOTAL_ENERGY"] * df["TOTAL_TIME"]
 df["ED2P"] = df["TOTAL_ENERGY"] * (df["TOTAL_TIME"] ** 2)
-df = df[["NODES", "NTASKS_PER_NODE", "CPUS_PER_TASK", "MESH_LEVEL", "MPS", "TOTAL_TIME", "TOTAL_ENERGY", "EDP", "ED2P"]]
+df = df[["NODES", "NTASKS_PER_NODE", "CPUS_PER_TASK", "MESH_LEVEL", "MPS", "TOTAL_TIME", "TOTAL_ENERGY", "EDP", "ED2P", "JOBID"]].sort_values(by=["NODES", "NTASKS_PER_NODE", "MPS"])
 df.to_csv(f"{output_dir}/{outout_filename}", index=False)
 

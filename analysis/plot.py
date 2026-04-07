@@ -50,15 +50,15 @@ def plot(dframe, y_axis_str, outfilename):
     ax.set_xticklabels([f"Nodes={g}\nMesh Level={ml}" for g,ml in zip(groups_lvl1, mesh_levels)])
 
     # ---- Labels ----
-    if y_axis_str == "TOTAL_TIME":
+    if y_axis_str == "TOTAL_TIME_mean":
         y_lab = "Time To Solution [s]"
         title_lab = "Elmer/Ice Greenland SSA: Execution Time Breakdown"
 
-    if y_axis_str == "TOTAL_ENERGY":
+    if y_axis_str == "TOTAL_ENERGY_mean":
         y_lab = "Energy To Solution [J]"
         title_lab = "Elmer/Ice Greenland SSA: Execution Energy Breakdown"
 
-    if y_axis_str == "EDP":
+    if y_axis_str == "EDP_mean":
         y_lab = "Energy-Delay Product [J * s]"
         title_lab = "Elmer/Ice Greenland SSA: Execution Energy-Delay Product Breakdown"
     
@@ -83,14 +83,42 @@ Path(output_dir).mkdir(parents=True, exist_ok=True)
 
 df = pd.read_csv(input_data_path)
 
+# columns to aggregate
+metrics = ["TOTAL_TIME", "TOTAL_ENERGY", "EDP", "ED2P"]
+
+# groupby + aggregation
+result = (
+    df.groupby(["NODES", "NTASKS_PER_NODE", "CPUS_PER_TASK", "MESH_LEVEL", "MPS"])
+      .agg(
+          {col: ["mean", "std"] for col in metrics} |
+          {"JOBID": "count"}
+      )
+)
+
+# flatten column names
+result.columns = [
+    f"{col}_{stat}" if stat != "" else col
+    for col, stat in result.columns
+]
+
+# rename count column
+df = result.rename(columns={"JOBID_count": "count"}).reset_index()
+df = df.fillna(0)
+df["TOTAL_TIME_delta"] = df["TOTAL_TIME_std"] * 1.96 / np.sqrt(df["count"]) 
+df["TOTAL_ENERGY_delta"] = df["TOTAL_ENERGY_std"] * 1.96 / np.sqrt(df["count"])
+df["EDP_delta"] = df["EDP_std"] * 1.96 / np.sqrt(df["count"])
+df["ED2P_delta"] = df["ED2P_std"] * 1.96 / np.sqrt(df["count"])
+
+#print(df)
+
 strong_scaling = df[df["MESH_LEVEL"]==3].sort_values(by=["NODES", "NTASKS_PER_NODE", "MPS"])
 weak_scaling = df[df['MESH_LEVEL'].isin([4, 5]) | df['NODES'].isin([1])].sort_values(by=["NODES", "NTASKS_PER_NODE", "MPS"])
 
-plot(strong_scaling, "TOTAL_TIME", output_dir + "/strong_time_breakdown.png")
-plot(strong_scaling, "TOTAL_ENERGY", output_dir + "/strong_energy_breakdown.png")
-plot(strong_scaling, "EDP", output_dir + "/strong_energydelayprod_breakdown.png")
+plot(strong_scaling, "TOTAL_TIME_mean", output_dir + "/strong_time_breakdown.png")
+plot(strong_scaling, "TOTAL_ENERGY_mean", output_dir + "/strong_energy_breakdown.png")
+plot(strong_scaling, "EDP_mean", output_dir + "/strong_energydelayprod_breakdown.png")
 
-plot(weak_scaling, "TOTAL_TIME", output_dir + "/weak_time_breakdown.png")
-plot(weak_scaling, "TOTAL_ENERGY", output_dir + "/weak_energy_breakdown.png")
-plot(weak_scaling, "EDP", output_dir + "/weak_energydelayprod_breakdown.png")
+plot(weak_scaling, "TOTAL_TIME_mean", output_dir + "/weak_time_breakdown.png")
+plot(weak_scaling, "TOTAL_ENERGY_mean", output_dir + "/weak_energy_breakdown.png")
+plot(weak_scaling, "EDP_mean", output_dir + "/weak_energydelayprod_breakdown.png")
 
