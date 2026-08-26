@@ -1,9 +1,9 @@
 #!/bin/bash -l
-#SBATCH --job-name=run_Elmer_roihu_N1_n72_c1_ML1
+#SBATCH --job-name=run_Elmer_roihu_N1_n16_c1_ML3
 #SBATCH --account=project_2001659
-#SBATCH --partition=gputest
+#SBATCH --partition=gpumedium
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=72
+#SBATCH --ntasks-per-node=16
 #SBATCH --cpus-per-task=1
 #SBATCH --gres=gpu:gh200:4
 #SBATCH --time=00:15:00
@@ -13,7 +13,7 @@
 #SBATCH --error=%x_%j.err
 
 # MESH LEVEL
-export MESH_LEVEL="1"
+export MESH_LEVEL="3"
 
 # DIR PATHS
 export BASEDIR="/scratch/project_2001659/danieree/rsync/my_ElmerIceEnergy"
@@ -29,11 +29,6 @@ export PMIX_MCA_psec=native
 export OMPI_MCA_btl=^openib
 
 # CONTAINER PATH
-# working, old commit
-# export CONTAINER=${CONTAINERSDIR}/container.sif
-# current devel, doesnt work
-# export CONTAINER=${CONTAINERSDIR}/container_devel.sif
-# possible fix, testing...
 export CONTAINER=${CONTAINERSDIR}/container_fix.sif
 
 export GREENLAND=${RUNDIR}/Greenland_SSA

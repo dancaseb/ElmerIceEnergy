@@ -1,9 +1,9 @@
 #!/bin/bash -l
-#SBATCH --job-name=run_Elmer_roihu_N1_n16_c1_ML1_MPS
+#SBATCH --job-name=run_Elmer_roihu_N1_n72_c1_ML1_MPS
 #SBATCH --account=project_2001659
 #SBATCH --partition=gputest
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=16
+#SBATCH --ntasks-per-node=72
 #SBATCH --cpus-per-task=1
 #SBATCH --gres=gpu:gh200:4
 #SBATCH --time=00:15:00
@@ -56,5 +56,5 @@ end=$(date +%s)
 echo "Elapsed time: $(($end-$start)) s"
 echo "-----------------------------------"
 
-mv ${GREENLAND}/MESH/*.*vtu ${GREENLAND}/ 2>/dev/null
+# mv ${GREENLAND}/MESH/*.*vtu ${GREENLAND}/ 2>/dev/null
 rm -r ${GREENLAND}/MESH
