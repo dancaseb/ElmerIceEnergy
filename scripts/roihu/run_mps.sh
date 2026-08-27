@@ -1,19 +1,6 @@
 #!/bin/bash -l
-#SBATCH --job-name=run_Elmer_roihu_N1_n72_c1_ML1_MPS
-#SBATCH --account=project_2001659
-#SBATCH --partition=gputest
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=72
-#SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu:gh200:4
-#SBATCH --time=00:15:00
-#SBATCH --mem=0
-#SBATCH --exclusive
-#SBATCH --output=%x_%j.out
-#SBATCH --error=%x_%j.err
-
 # MESH LEVEL
-export MESH_LEVEL="1"
+export MESH_LEVEL=$1
 
 # DIR PATHS
 export BASEDIR="/scratch/project_2001659/danieree/rsync/my_ElmerIceEnergy"
