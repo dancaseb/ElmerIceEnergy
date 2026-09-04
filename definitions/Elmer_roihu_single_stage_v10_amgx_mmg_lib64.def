@@ -429,7 +429,7 @@ EOF
     fi
 
     cd /opt/src
-    git clone --recursive --branch fix-printmeshsize-bug https://github.com/dancaseb/elmerfem.git elmerfem
+    git clone --recursive --branch devel https://github.com/ElmerCSC/elmerfem.git elmerfem
     cd /opt/src/elmerfem
 #    git checkout 9dce9c2ac192b50fd29f00bef746debac1a8018e
     git submodule update --init --recursive
