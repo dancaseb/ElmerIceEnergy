@@ -490,7 +490,32 @@ Stage0 += shell(commands=['apt-get update && apt install -y wget libglib2.0-0',
 'wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/{}/{} && dpkg -i {} && rm {}'.format(config["instruction"], nsys_file, nsys_file, nsys_file)
 ])
 
+Stage0 += shell(commands=['wget https://icl.utk.edu/projects/papi/downloads/papi-7.2.0.tar.gz', 
+    'tar xzf papi-7.2.0.tar.gz', 
+    'cd papi-7.2.0', 
+    './configure --prefix=/opt/papi', 
+    'make', 
+    'make install'
+])
 
+Stage0 += shell(commands=['wget https://download.open-mpi.org/release/hwloc/v2.14/hwloc-2.14.0.tar.gz',
+    'tar xzf hwloc-2.14.0.tar.gz', 
+    'cd hwloc-2.14.0', 
+    './configure --prefix=/opt/hwloc', 
+    'make', 
+    'make install', 
+    'export PATH=$PATH:/opt/hwloc/bin',
+    'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/hwloc/lib',
+    'export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/opt/hwloc/lib/pkgconfig',
+    'export MANPATH=$MANPATH:/opt/hwloc/share/man'])
+
+Stage0 += shell(commands=['wget https://pm.bsc.es/ftp/dlb/releases/dlb-3.8.0.tar.gz', 
+    'tar xzf dlb-3.8.0.tar.gz', 
+    'cd dlb-3.8.0', 
+    './configure --prefix=/opt/dlb --with-mpi=/opt/openmpi --with-cuda=/usr/local/cuda-12.5 --with-papi=/opt/papi --with-hwloc=/opt/hwloc', 
+    'make', 
+    'make install'
+]) 
 
 ################################################################################
 Stage0 += comment("step7: start")
@@ -540,4 +565,35 @@ nsys_file='nsight-systems-2025.3.1_2025.3.1.90-1_arm64.deb' if config["instructi
 
 Stage1 += shell(commands=['apt-get update && apt install -y wget libglib2.0-0',
 'wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/{}/{} && dpkg -i {} && rm {}'.format(config["instruction"], nsys_file, nsys_file, nsys_file)
+])
+
+Stage1 += shell(commands=['apt-get update && apt install -y wget libglib2.0-0',
+'wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/{}/{} && dpkg -i {} && rm {}'.format(config["instruction"], nsys_file, nsys_file, nsys_file)
+])
+
+Stage1 += shell(commands=['wget https://icl.utk.edu/projects/papi/downloads/papi-7.2.0.tar.gz',
+    'tar xzf papi-7.2.0.tar.gz',
+    'cd papi-7.2.0',
+    './configure --prefix=/opt/papi',
+    'make',
+    'make install'
+])
+
+Stage1 += shell(commands=['wget https://download.open-mpi.org/release/hwloc/v2.14/hwloc-2.14.0.tar.gz',
+    'tar xzf hwloc-2.14.0.tar.gz',
+    'cd hwloc-2.14.0',
+    './configure --prefix=/opt/hwloc',
+    'make',
+    'make install',
+    'export PATH=$PATH:/opt/hwloc/bin',
+    'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/hwloc/lib',
+    'export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/opt/hwloc/lib/pkgconfig',
+    'export MANPATH=$MANPATH:/opt/hwloc/share/man'])
+
+Stage1 += shell(commands=['wget https://pm.bsc.es/ftp/dlb/releases/dlb-3.8.0.tar.gz',
+    'tar xzf dlb-3.8.0.tar.gz',
+    'cd dlb-3.8.0',
+    './configure --prefix=/opt/dlb --with-mpi=/opt/openmpi --with-cuda=/usr/local/cuda-12.5 --with-papi=/opt/papi --with-hwloc=/opt/hwloc',
+    'make',
+    'make install'
 ])
