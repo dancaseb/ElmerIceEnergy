@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import json
 from pathlib import Path
 
@@ -483,8 +481,19 @@ elmer = hpccm.building_blocks.generic_cmake(
 )
 Stage0 += elmer
 
-################################################################################
 Stage0 += comment("step6: start")
+Stage0 += comment("Install profiler")
+
+nsys_file='nsight-systems-2025.3.1_2025.3.1.90-1_arm64.deb' if config["instruction"]=="arm64" else 'NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb'
+
+Stage0 += shell(commands=['apt-get update && apt install -y wget libglib2.0-0',
+'wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/{}/{} && dpkg -i {} && rm {}'.format(config["instruction"], nsys_file, nsys_file, nsys_file)
+])
+
+
+
+################################################################################
+Stage0 += comment("step7: start")
 Stage0 += comment("Generate runtime image")
 
 Stage1 += baseimage(
@@ -526,3 +535,9 @@ Stage1 += bb.packages(
         "libnetcdff-dev",
     ],
 )
+
+nsys_file='nsight-systems-2025.3.1_2025.3.1.90-1_arm64.deb' if config["instruction"]=="arm64" else 'NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb'
+
+Stage1 += shell(commands=['apt-get update && apt install -y wget libglib2.0-0',
+'wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/{}/{} && dpkg -i {} && rm {}'.format(config["instruction"], nsys_file, nsys_file, nsys_file)
+])

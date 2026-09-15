@@ -1,5 +1,6 @@
 {
     "arch": "aarch64",
+    "instruction": "arm64",
     "march": "neoverse_v2",
     "cuda_arch": "90",
     "base_image": "nvidia/cuda",

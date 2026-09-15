@@ -489,6 +489,15 @@ Stage: devel
 
 # step6: start
 
+# Install profiler
+
+%post
+    cd /
+    apt-get update && apt install -y wget libglib2.0-0
+    wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/amd64/NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb && dpkg -i NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb && rm NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb
+
+# step7: start
+
 # Generate runtime image
 
 BootStrap: docker
@@ -780,3 +789,8 @@ From: docker.io/nvidia/cuda@sha256:0e5a4647ccb8589bb364605cca6c2e17b35b226d4b917
         libsuitesparse-dev \
         libumfpack6
     rm -rf /var/lib/apt/lists/*
+
+%post
+    cd /
+    apt-get update && apt install -y wget libglib2.0-0
+    wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/amd64/NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb && dpkg -i NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb && rm NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb
