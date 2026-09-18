@@ -1,0 +1,9 @@
+configuration_label,configuration,nodes,mpi_ranks,cpus_per_rank,total_cpus,mesh_level,execution_mode,elapsed_time,uses_mps
+4,N1_n4_c8_ML3,1,4,8,32,3,Standard,75.2,False
+4 MPS,N1_n4_c8_ML3_MPS,1,4,8,32,3,MPS,70.4,True
+8,N1_n8_c4_ML3,1,8,4,32,3,Standard,44.8,False
+8 MPS,N1_n8_c4_ML3_MPS,1,8,4,32,3,MPS,42.3,True
+16,N1_n16_c2_ML3,1,16,2,32,3,Standard,28.7,False
+16 MPS,N1_n16_c2_ML3_MPS,1,16,2,32,3,MPS,27.5,True
+32,N1_n32_c1_ML3,1,32,1,32,3,Standard,20.1,False
+32 MPS,N1_n32_c1_ML3_MPS,1,32,1,32,3,MPS,19.4,True
