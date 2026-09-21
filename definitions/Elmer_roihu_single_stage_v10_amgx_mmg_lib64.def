@@ -72,7 +72,8 @@ From: satama.csc.fi/r_installation_spack/core-gpu-gcc-14.3.0-cuda-12.9.1:v2026_0
         zlib-devel \
         blas-devel \
         lapack-devel \
-        suitesparse-devel
+        suitesparse-devel \
+        numactl-devel
 
     dnf clean all
     ldconfig
@@ -541,6 +542,62 @@ PY_ZOLTAN_GCC14_PATCH
     /opt/elmer/bin/ElmerSolver -v || true
     /opt/elmer/bin/ElmerGrid || true
 
+    # -------------------------------------------------------------------------
+    # PAPI 7.2.0 — hardware-counter library DLB/TALP uses for its CPU-side
+    # efficiency metrics.
+    # -------------------------------------------------------------------------
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://github.com/icl-utk-edu/papi/releases/download/papi-7-2-0-t/papi-7.2.0.tar.gz
+    tar --no-same-owner -xzf /opt/src/papi-7.2.0.tar.gz -C /opt/src
+    cd /opt/src/papi-7.2.0/src
+    chmod -R u+rwX . || true
+    bash ./configure --prefix=/opt/papi
+    make -j"${JOBS}"
+    make install
+    rm -rf /opt/src/papi-7.2.0 /opt/src/papi-7.2.0.tar.gz
+
+    export PATH="/opt/papi/bin:${PATH}"
+    export LD_LIBRARY_PATH="/opt/papi/lib:${LD_LIBRARY_PATH:-}"
+    export LIBRARY_PATH="/opt/papi/lib:${LIBRARY_PATH:-}"
+    export PKG_CONFIG_PATH="/opt/papi/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+    export MANPATH="/opt/papi/share/man:${MANPATH:-}"
+
+    # -------------------------------------------------------------------------
+    # DLB 3.8.0 — provides the TALP performance-tracking mode. Not linked into
+    # Elmer; it is LD_PRELOAD'd as libdlb_mpi.so at run time
+    # (see scripts/roihu/run.sh and scripts/roihu/wrapper-start.sh).
+    # -------------------------------------------------------------------------
+    MPI_PREFIX="$(dirname "$(dirname "$(command -v mpicc)")")"
+    test -n "${MPI_PREFIX}"
+
+    cd /
+    wget -q -nc --no-check-certificate -P /opt/src \
+        https://pm.bsc.es/ftp/dlb/releases/dlb-3.8.0.tar.gz
+    tar --no-same-owner -xzf /opt/src/dlb-3.8.0.tar.gz -C /opt/src
+    cd /opt/src/dlb-3.8.0
+    chmod -R u+rwX . || true
+    bash ./configure \
+        --prefix=/opt/dlb \
+        --with-mpi="${MPI_PREFIX}" \
+        --with-cuda="${CUDA_HOME}" \
+        --with-papi=/opt/papi
+    make -j"${JOBS}"
+    make install
+    rm -rf /opt/src/dlb-3.8.0 /opt/src/dlb-3.8.0.tar.gz
+
+    export PATH="/opt/dlb/bin:${PATH}"
+    export LD_LIBRARY_PATH="/opt/dlb/lib:${LD_LIBRARY_PATH:-}"
+    export LIBRARY_PATH="/opt/dlb/lib:${LIBRARY_PATH:-}"
+    export PKG_CONFIG_PATH="/opt/dlb/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+    export MANPATH="/opt/dlb/share/man:${MANPATH:-}"
+
+    cat >> /etc/ld.so.conf.d/elmer-roihu-opt.conf <<'EOF'
+/opt/papi/lib
+/opt/dlb/lib
+EOF
+    ldconfig
+
 %environment
     if [ -f /opt/activate.sh ]; then
         . /opt/activate.sh
@@ -548,11 +605,12 @@ PY_ZOLTAN_GCC14_PATCH
 
     CUDA_HOME="${CUDA_HOME:-${CUDA_PATH:-/usr/local/cuda}}"
     export CUDA_HOME
-    export PATH=/opt/elmer/bin:/opt/gmsh/bin:/opt/parmetis/bin:/opt/metis/bin:/opt/hypre/bin:/opt/nn/bin:/opt/csa/bin:/opt/mmg/bin:/opt/parmmg/bin:/opt/lua/bin:/opt/netcdf/bin:/opt/hdf5/bin:/usr/local/bin:${CUDA_HOME}/bin:$PATH
-    export LD_LIBRARY_PATH=/opt/elmer/lib:/opt/gmsh/lib:/opt/parmetis/lib:/opt/metis/lib:/opt/hypre/lib:/opt/nn/lib:/opt/csa/lib:/opt/mmg/lib64:/opt/mmg/lib:/opt/parmmg/lib64:/opt/parmmg/lib:/opt/amgx/lib:/opt/lua/lib:/opt/netcdf/lib:/opt/hdf5/lib:${CUDA_HOME}/lib64:$LD_LIBRARY_PATH
-    export LIBRARY_PATH=/opt/elmer/lib:/opt/gmsh/lib:/opt/parmetis/lib:/opt/metis/lib:/opt/hypre/lib:/opt/nn/lib:/opt/csa/lib:/opt/mmg/lib64:/opt/mmg/lib:/opt/parmmg/lib64:/opt/parmmg/lib:/opt/amgx/lib:/opt/lua/lib:/opt/netcdf/lib:/opt/hdf5/lib:${CUDA_HOME}/lib64:$LIBRARY_PATH
+    export PATH=/opt/elmer/bin:/opt/gmsh/bin:/opt/parmetis/bin:/opt/metis/bin:/opt/hypre/bin:/opt/nn/bin:/opt/csa/bin:/opt/mmg/bin:/opt/parmmg/bin:/opt/lua/bin:/opt/netcdf/bin:/opt/hdf5/bin:/opt/papi/bin:/opt/dlb/bin:/usr/local/bin:${CUDA_HOME}/bin:$PATH
+    export LD_LIBRARY_PATH=/opt/elmer/lib:/opt/gmsh/lib:/opt/parmetis/lib:/opt/metis/lib:/opt/hypre/lib:/opt/nn/lib:/opt/csa/lib:/opt/mmg/lib64:/opt/mmg/lib:/opt/parmmg/lib64:/opt/parmmg/lib:/opt/amgx/lib:/opt/lua/lib:/opt/netcdf/lib:/opt/hdf5/lib:/opt/papi/lib:/opt/dlb/lib:${CUDA_HOME}/lib64:$LD_LIBRARY_PATH
+    export LIBRARY_PATH=/opt/elmer/lib:/opt/gmsh/lib:/opt/parmetis/lib:/opt/metis/lib:/opt/hypre/lib:/opt/nn/lib:/opt/csa/lib:/opt/mmg/lib64:/opt/mmg/lib:/opt/parmmg/lib64:/opt/parmmg/lib:/opt/amgx/lib:/opt/lua/lib:/opt/netcdf/lib:/opt/hdf5/lib:/opt/papi/lib:/opt/dlb/lib:${CUDA_HOME}/lib64:$LIBRARY_PATH
     export CPATH=/opt/parmetis/include:/opt/metis/include:/opt/hypre/include:/opt/nn/include:/opt/csa/include:/opt/mmg/include:/opt/parmmg/include:/opt/amgx/include:/opt/lua/include:/opt/netcdf/include:/opt/hdf5/include:${CUDA_HOME}/include:$CPATH
     export CMAKE_PREFIX_PATH=/opt/elmer:/opt/gmsh:/opt/parmetis:/opt/metis:/opt/hypre:/opt/nn:/opt/csa:/opt/mmg:/opt/parmmg:/opt/amgx:/opt/lua:/opt/netcdf:/opt/hdf5:$CMAKE_PREFIX_PATH
+    export DLB_PREFIX=/opt/dlb
 
 %runscript
     . /opt/activate.sh

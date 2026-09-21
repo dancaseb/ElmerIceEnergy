@@ -24,11 +24,11 @@ export OMPI_MCA_btl=^openib
 
 # CONTAINER PATH
 # working, old commit
-# export CONTAINER=${CONTAINERSDIR}/container.sif
+export CONTAINER="/scratch/project_2001659/danieree/elmer-linsys/containers/container_hypre_nonunified_memory_AMS_fixed.sif"
 # current devel, doesnt work
 # export CONTAINER=${CONTAINERSDIR}/container_devel.sif
 # possible fix, testing...
-export CONTAINER=${CONTAINERSDIR}/container.sif
+# export CONTAINER=${CONTAINERSDIR}/container.sif
 
 export GREENLAND=${RUNDIR}/Greenland_SSA
 
@@ -57,8 +57,19 @@ else
     BIND_ARGS=(--bind-to none)
 fi
 
+# TALP (DLB): set TALP=1 in the environment to LD_PRELOAD libdlb_mpi.so and
+# have it dump a per-run efficiency report; see analysis/talp_compare.py.
+export DLB_PREFIX="/opt/dlb"
+APPTAINER_ENV_ARGS=(--env UCX_POSIX_USE_PROC_LINK=n)
+if [ "${TALP:-0}" = "1" ]; then
+    APPTAINER_ENV_ARGS+=(
+        --env LD_PRELOAD="${DLB_PREFIX}/lib/libdlb_mpi.so"
+        --env DLB_ARGS="--talp --talp-output-file=ElmerIce_Talp_N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}_${SLURM_JOB_ID}.json"
+    )
+fi
+
 start=$(date +%s)
-srun -N1 -n1 apptainer run --nv --bind="$(csc-common-bind),${GREENLAND}" --env UCX_POSIX_USE_PROC_LINK=n ${CONTAINER} \
+srun -N1 -n1 apptainer run --nv --bind="$(csc-common-bind),${GREENLAND}" "${APPTAINER_ENV_ARGS[@]}" ${CONTAINER} \
     env -u SLURM_JOBID -u SLURM_JOB_ID -u SLURM_NTASKS -u SLURM_NPROCS -u SLURM_NODELIST -u SLURM_STEP_NODELIST \
         -u SLURM_STEP_ID -u SLURM_PROCID -u SLURM_LOCALID -u SLURM_NODEID \
     mpirun -np ${RANKS} --host localhost:${RANKS} "${BIND_ARGS[@]}" ElmerSolver_mpi SSA_amgx_ML${MESH_LEVEL}.sif
