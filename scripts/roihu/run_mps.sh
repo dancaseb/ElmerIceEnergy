@@ -10,7 +10,7 @@ export TOTAL_CPUS=$3
 
 # DIR PATHS
 export BASEDIR="/scratch/project_2001659/danieree/rsync/my_ElmerIceEnergy"
-export RUNDIR="${BASEDIR}/runs/roihu/test_bicgstab/N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}_MPS/run_Elmer_roihu_N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}_MPS_optimized_${SLURM_JOB_ID}"
+export RUNDIR="${BASEDIR}/runs/roihu/TALP/N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}_MPS/run_Elmer_roihu_N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}_MPS_${SLURM_JOB_ID}"
 export SCRIPTSDIR="${BASEDIR}/scripts"
 export CONTAINERSDIR="${BASEDIR}/containers"
 export INPUTSDIR="${BASEDIR}/inputs"
@@ -25,7 +25,7 @@ export OMPI_MCA_btl=^openib
 # working, old commit
 # export CONTAINER=${CONTAINERSDIR}/container.sif
 # current devel, testing...
-export CONTAINER=${CONTAINERSDIR}/container.sif
+export CONTAINER="/scratch/project_2001659/danieree/rsync/my_ElmerIceEnergy/containers/container.sif"
 
 export GREENLAND=${RUNDIR}/Greenland_SSA
 

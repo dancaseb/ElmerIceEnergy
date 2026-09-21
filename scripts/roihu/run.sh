@@ -11,7 +11,7 @@ export TOTAL_CPUS=$3
 
 # DIR PATHS
 export BASEDIR="/scratch/project_2001659/danieree/rsync/my_ElmerIceEnergy"
-export RUNDIR="${BASEDIR}/runs/roihu/final_measurments/N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}/run_Elmer_roihu_N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}_${SLURM_JOB_ID}"
+export RUNDIR="${BASEDIR}/runs/roihu/TALP/N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}/run_Elmer_roihu_N${SLURM_NNODES}_n${RANKS}_c${CPUS_PER_RANK}_ML${MESH_LEVEL}_${SLURM_JOB_ID}"
 export SCRIPTSDIR="${BASEDIR}/scripts"
 export CONTAINERSDIR="${BASEDIR}/containers"
 export INPUTSDIR="${BASEDIR}/inputs"
@@ -24,7 +24,7 @@ export OMPI_MCA_btl=^openib
 
 # CONTAINER PATH
 # working, old commit
-export CONTAINER="/scratch/project_2001659/danieree/elmer-linsys/containers/container_hypre_nonunified_memory_AMS_fixed.sif"
+export CONTAINER="/scratch/project_2001659/danieree/rsync/my_ElmerIceEnergy/containers/container.sif"
 # current devel, doesnt work
 # export CONTAINER=${CONTAINERSDIR}/container_devel.sif
 # possible fix, testing...
