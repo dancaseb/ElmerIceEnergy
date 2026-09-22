@@ -1,16 +1,15 @@
-#!/usr/bin/env python
-
 import json
 from pathlib import Path
 
 import hpccm
 import hpccm.building_blocks as bb
 from hpccm.primitives import baseimage, comment
-
+from hpccm.primitives.environment import environment
+from hpccm.primitives.copy import copy
 # Get correct config
-# config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_thea.json"))
+#config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_thea.json"))
 config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_leonardo.json"))
-# config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_jedi.json"))
+#config_file = Path(USERARG.get("config-file", "../configs/ubuntu24_jedi.json"))
 if not config_file.exists():
     raise RuntimeError(
         "cannot access {}: No such file or directory".format(config_file)
@@ -45,6 +44,8 @@ Stage0 += bb.packages(
         "gfortran",
         "zlib1g",
         "zlib1g-dev",
+        "libnuma-dev",
+        "cuda-cupti-12-5"
     ],
 )
 
@@ -407,7 +408,7 @@ elmer_prefix = "/opt/elmer"
 elmer_env = {
     "PATH": "{}/bin:$PATH".format(elmer_prefix),
     "LIBRARY_PATH": "{}/lib:$LIBRARY_PATH".format(elmer_prefix),
-    "LD_LIBRARY_PATH": "{}/lib::$LIBRARY_PATH".format(elmer_prefix),
+    "LD_LIBRARY_PATH": "{}/lib:$LD_LIBRARY_PATH".format(elmer_prefix),
 }
 
 elmer_toolchain = hpccm.toolchain(LDFLAGS="-lcurl")
@@ -436,7 +437,7 @@ elmer = hpccm.building_blocks.generic_cmake(
             config["arch"]
         ),
         '-DNETCDF_INCLUDE_DIR="/usr/include"',
-        '-DHYPRE_INCLUDE_DIR="/opt/include/hypre"',
+        '-DHYPRE_INCLUDE_DIR="/opt/hypre/include"',
         "-DWITH_Zoltan:BOOL=TRUE",
         "-DWITH_Trilinos:BOOL=FALSE",
         "-DWITH_ELMERGUI:BOOL=FALSE",
@@ -483,8 +484,54 @@ elmer = hpccm.building_blocks.generic_cmake(
 )
 Stage0 += elmer
 
-################################################################################
 Stage0 += comment("step6: start")
+Stage0 += comment("Install profiler")
+
+nsys_file='nsight-systems-2025.3.1_2025.3.1.90-1_arm64.deb' if config["instruction"]=="arm64" else 'NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb'
+
+Stage0 += shell(commands=['apt-get update && apt install -y wget libglib2.0-0',
+'wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/{}/{} && dpkg -i {} && rm {}'.format(config["instruction"], nsys_file, nsys_file, nsys_file)
+])
+
+Stage0 += shell(commands=['wget https://github.com/icl-utk-edu/papi/releases/download/papi-7-2-0-t/papi-7.2.0.tar.gz', 
+    'tar --no-same-owner -xzf papi-7.2.0.tar.gz', 
+    'cd papi-7.2.0/src', 
+    './configure --prefix=/opt/papi', 
+    'make', 
+    'make install'
+])
+
+Stage0 += environment(
+    variables={
+        'PATH': '/opt/papi/bin:$PATH',
+        'LD_LIBRARY_PATH': '/opt/papi/lib:$LD_LIBRARY_PATH',
+        'LIBRARY_PATH': '/opt/papi/lib:$LIBRARY_PATH',
+        'PKG_CONFIG_PATH': '/opt/papi/lib/pkgconfig:$PKG_CONFIG_PATH',
+        'MANPATH': '/opt/papi/share/man:$MANPATH'
+    }
+)
+
+Stage0 += shell(commands=['wget https://pm.bsc.es/ftp/dlb/releases/dlb-3.8.0.tar.gz',
+    'tar --no-same-owner -xzf dlb-3.8.0.tar.gz',
+    'cd dlb-3.8.0',
+    './configure --prefix=/opt/dlb --with-mpi=/opt/openmpi --with-cuda=/usr/local/cuda-12.5 --with-papi=/opt/papi',
+    'make',
+    'make install'
+])
+
+
+Stage0 += environment(
+    variables={
+        'PATH': '/opt/dlb/bin:$PATH',
+        'LD_LIBRARY_PATH': '/opt/dlb/lib:$LD_LIBRARY_PATH',
+        'LIBRARY_PATH': '/opt/dlb/lib:$LIBRARY_PATH',
+        'PKG_CONFIG_PATH': '/opt/dlb/lib/pkgconfig:$PKG_CONFIG_PATH',
+        'MANPATH': '/opt/dlb/share/man:$MANPATH'
+    }
+)
+
+################################################################################
+Stage0 += comment("step7: start")
 Stage0 += comment("Generate runtime image")
 
 Stage1 += baseimage(
@@ -504,10 +551,12 @@ Stage1 += bb.packages(
         "gcc-13-offload-nvptx",
         "gfortran",
         "libgomp1",
-        "libnuma1",
         "libcurl4",
         "zlib1g",
         "zlib1g-dev",
+        "libnuma-dev",
+        "make",
+        "cuda-cupti-12-5"
     ]
 )
 
@@ -526,3 +575,43 @@ Stage1 += bb.packages(
         "libnetcdff-dev",
     ],
 )
+
+nsys_file='nsight-systems-2025.3.1_2025.3.1.90-1_arm64.deb' if config["instruction"]=="arm64" else 'NsightSystems-linux-cli-public-2025.3.1.90-3582212.deb'
+
+Stage1 += shell(commands=['apt-get update && apt install -y wget libglib2.0-0',
+'wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/{}/{} && dpkg -i {} && rm {}'.format(config["instruction"], nsys_file, nsys_file, nsys_file)
+])
+
+Stage1 += shell(commands=['apt-get update && apt install -y wget libglib2.0-0',
+'wget https://developer.download.nvidia.com/devtools/repos/ubuntu2404/{}/{} && dpkg -i {} && rm {}'.format(config["instruction"], nsys_file, nsys_file, nsys_file)
+])
+
+Stage1 += copy(
+    _from='devel',
+    files={
+        '/opt/papi': '/opt/papi',
+        '/opt/dlb': '/opt/dlb'
+    }
+)
+
+Stage1 += environment(
+    variables={
+        'PATH': '/opt/papi/bin:$PATH',
+        'LD_LIBRARY_PATH': '/opt/papi/lib:$LD_LIBRARY_PATH',
+        'LIBRARY_PATH': '/opt/papi/lib:$LIBRARY_PATH',
+        'PKG_CONFIG_PATH': '/opt/papi/lib/pkgconfig:$PKG_CONFIG_PATH',
+        'MANPATH': '/opt/papi/share/man:$MANPATH'
+    }
+)
+
+
+Stage1 += environment(
+    variables={
+        'PATH': '/opt/dlb/bin:$PATH',
+        'LD_LIBRARY_PATH': '/opt/dlb/lib:$LD_LIBRARY_PATH',
+        'LIBRARY_PATH': '/opt/dlb/lib:$LIBRARY_PATH',
+        'PKG_CONFIG_PATH': '/opt/dlb/lib/pkgconfig:$PKG_CONFIG_PATH',
+        'MANPATH': '/opt/dlb/share/man:$MANPATH'
+    }
+)
+

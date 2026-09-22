@@ -73,3 +73,15 @@ The same scripts that produce the results above, crash with Segmentation Fault w
 - `ElmerCSC/elmerfem@7b073597d1c1df84367f1dfaa44972306643a311`
 
 See `definitions/Elmer_ubuntu24_leonardo_most_recent.def` and `scripts/Leonardo_most_recent/run_Elmer_leonardo_N1_n4_c8_ML3_most_recent_39212184.err`
+
+
+# TALP 
+
+Here, we provide preliminary TALP results for the Greenland SSA with Mesh Level 3 on one Leonardo Booster node.
+For details on TALP see for instance [TALP](https://dlb-docs.readthedocs.io/en/dlb-3.6/index.html).
+The TALP installation has been integrated into the Singularity container definitions.
+Full results and analysis can be found in `talp_analysis/Leonardo_reports` here below there is a summary table:
+
+![TALP Results](talp_analysis/Leonardo_reports/efficiency_heatmap.png)
+
+ 

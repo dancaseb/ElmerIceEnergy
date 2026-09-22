@@ -1,5 +1,6 @@
 {
     "arch": "x86_64",
+    "instruction": "amd64",
     "march": "skylake",
     "cuda_arch": "80",
     "base_image": "nvidia/cuda",
