@@ -23,12 +23,7 @@ export PMIX_MCA_psec=native
 export OMPI_MCA_btl=^openib
 
 # CONTAINER PATH
-# working, old commit
 export CONTAINER="/scratch/project_2001659/danieree/rsync/my_ElmerIceEnergy/containers/container.sif"
-# current devel, doesnt work
-# export CONTAINER=${CONTAINERSDIR}/container_devel.sif
-# possible fix, testing...
-# export CONTAINER=${CONTAINERSDIR}/container.sif
 
 export GREENLAND=${RUNDIR}/Greenland_SSA
 
@@ -43,14 +38,12 @@ srun -N1 -n1 apptainer run --bind="$(csc-common-bind),${GREENLAND}" ${CONTAINER}
 # ELMERF90
 srun -N1 -n1 apptainer run --bind="$(csc-common-bind),${GREENLAND}" ${CONTAINER} elmerf90 Scalar_OUTPUT.F90 -o Scalar_OUTPUT
 
-# ELMERSOLVER (no MPS: ranks time-slice GPU access via the default CUDA context scheduler)
-# one container start for the whole node; mpirun inside fans out to RANKS ranks x CPUS_PER_RANK cores each
-# (SLURM_* vars are unset for mpirun so PRRTE doesn't try to shell out to a host `srun` that doesn't exist in the container)
-#
-# Core binding: mpirun's own --bind-to/--map-by (via hwloc) only works when the cgroup owns the
-# whole node (every core ID it might pick is valid). When cpus-per-task is a subset of the node
-# (TOTAL_CPUS), hwloc can try to bind to a physical core the cgroup never granted this job and
-# fails with "hwloc_set_cpubind returned Error" — so skip explicit binding in that case.
+# ELMERSOLVER
+# Core binding: pinning ranks to specific cores (--bind-to core) crashes if this job
+# doesn't own every core on the node — mpirun can pick a core outside what Slurm
+# granted it. Skip pinning whenever cpus-per-task is less than the full node.
+
+# TODO: check if pinning has any performance impact
 if [ "${SLURM_CPUS_PER_TASK}" -eq "${TOTAL_CPUS}" ]; then
     BIND_ARGS=(--bind-to core --map-by "node:PE=${CPUS_PER_RANK}")
 else
@@ -80,5 +73,4 @@ echo "-----------------------------------"
 
 
 # Check the results
-# mv ${GREENLAND}/MESH/*.*vtu ${GREENLAND}/ 2>/dev/null
 rm -r ${GREENLAND}/MESH
